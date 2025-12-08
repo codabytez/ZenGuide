@@ -34,7 +34,7 @@
   --font-family-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
 }
 
-@theme dark {
+/* @theme dark {
   --color-background: oklch(from hsl(220 25% 8%) l c h);
   --color-foreground: oklch(from hsl(220 10% 95%) l c h);
   --color-card: oklch(from hsl(220 25% 12%) l c h);
@@ -62,7 +62,7 @@
   --color-sidebar-accent-foreground: oklch(from hsl(240 4.8% 95.9%) l c h);
   --color-sidebar-border: oklch(from hsl(240 3.7% 15.9%) l c h);
   --color-sidebar-ring: oklch(from hsl(217.2 91.2% 59.8%) l c h);
-}
+} */
 
 @layer base {
   * {
