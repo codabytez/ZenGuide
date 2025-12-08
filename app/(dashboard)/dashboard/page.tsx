@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import {useTours} from "@/context/ToursContext";
 
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -44,14 +43,13 @@ const DashboardOverview: React.FC = () => {
   ];
 
   return (
-    <DashboardLayout>
-      <div className="p-6 lg:p-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="flex items-center justify-between mb-8">
+    <div className="p-6 lg:p-8">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-3xl font-display font-bold text-foreground">Dashboard</h1>
               <p className="text-muted-foreground mt-1">
-                Welcome back! Here's an overview of your tours.
+                Welcome back! Here&apos;s an overview of your tours.
               </p>
             </div>
 
@@ -151,7 +149,6 @@ const DashboardOverview: React.FC = () => {
           </Card>
         </motion.div>
       </div>
-    </DashboardLayout>
   );
 };
 

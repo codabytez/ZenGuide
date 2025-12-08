@@ -38,7 +38,13 @@ const DEMO_USER: User = {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem("demo-auth-user");
+      return saved ? JSON.parse(saved) : null;
+    }
+    return null;
+  });
   const [isLoading, setIsLoading] = useState(false);
 
   // Load user from localStorage on client only
