@@ -117,23 +117,23 @@ const DashboardOverview: React.FC = () => {
                     <Link
                       key={tour.id}
                       href={`/dashboard/tours/${tour.id}`}
-                      className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors gap-3"
                     >
                       <div className="flex items-center gap-4">
                         <div
-                          className={`w-3 h-3 rounded-full ${
+                          className={`w-3 h-3 rounded-full flex-shrink-0 ${
                             tour.isActive ? "bg-green-500" : "bg-muted-foreground"
                           }`}
                         />
-                        <div>
-                          <p className="font-medium text-foreground">{tour.name}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium text-foreground truncate">{tour.name}</p>
                           <p className="text-sm text-muted-foreground">
                             {tour.steps.length} steps
                           </p>
                         </div>
                       </div>
 
-                      <div className="text-right">
+                      <div className="text-left sm:text-right pl-7 sm:pl-0">
                         <p className="text-sm font-medium text-foreground">
                           {tour.analytics.views} views
                         </p>
