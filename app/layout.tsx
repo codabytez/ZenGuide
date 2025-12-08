@@ -25,21 +25,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <AuthProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <body className={`${poppins.variable} font-sans antialiased`}>
+      <body className={`${poppins.variable} font-sans antialiased`}>
+        <AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="system">
             <ToursProvider>
-          {children}
+              {children}
             </ToursProvider>
-        <Toaster />
-          </body>
-        </ThemeProvider>
-      </AuthProvider>
+            <Toaster />
+          </ThemeProvider>
+        </AuthProvider>
+      </body>
     </html>
   );
 }
