@@ -14,23 +14,47 @@ const DashboardSidebar: React.FC = () => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Load collapsed state from localStorage after mount
+  // Check if mobile on mount and window resize
   useEffect(() => {
-    const saved = localStorage.getItem('sidebar-collapsed');
-    if (saved !== null) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsCollapsed(saved === 'true');
-    }
-    // Set mounted after reading localStorage to avoid hydration mismatch
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      
+      // On mobile, check saved state or default to collapsed
+      if (mobile) {
+        const saved = localStorage.getItem('sidebar-collapsed-mobile');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsCollapsed(saved === 'false' ? false : true); // Default collapsed on mobile
+      } else {
+        const saved = localStorage.getItem('sidebar-collapsed-desktop');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsCollapsed(saved === 'true');
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
     requestAnimationFrame(() => setIsMounted(true));
+
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Save collapsed state to localStorage when it changes
+  // Auto-collapse sidebar on mobile when pathname changes
+  useEffect(() => {
+    if (isMobile && isMounted) {
+      setIsCollapsed(true);
+      localStorage.setItem('sidebar-collapsed-mobile', 'true');
+    }
+  }, [pathname, isMobile, isMounted]);
+
+  // Save collapsed state to localStorage when it changes (separate keys for mobile/desktop)
   const toggleCollapse = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
-    localStorage.setItem('sidebar-collapsed', String(newState));
+    const storageKey = isMobile ? 'sidebar-collapsed-mobile' : 'sidebar-collapsed-desktop';
+    localStorage.setItem(storageKey, String(newState));
   };
   
   // TODO: Replace with actual user data from Convex
@@ -46,7 +70,13 @@ const DashboardSidebar: React.FC = () => {
     { path: '/dashboard/settings', icon: Settings, label: 'Settings' },
   ];
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => {
+    if (path === '/dashboard') {
+      return pathname === path;
+    }
+    // For other paths, check if the current path starts with the nav path
+    return pathname.startsWith(path);
+  };
 
   const handleLogout = () => {
     // TODO: Implement logout with Convex
@@ -54,19 +84,33 @@ const DashboardSidebar: React.FC = () => {
   };
 
   return (
-    <motion.aside 
-      initial={false}
-      animate={{ width: isCollapsed ? '80px' : '256px' }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="h-screen bg-card border-r border-border flex flex-col relative flex-shrink-0"
-    >
+    <>
+      {/* Backdrop overlay for mobile */}
+      {isMobile && !isCollapsed && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={toggleCollapse}
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+        />
+      )}
+      
+      <motion.aside 
+        initial={false}
+        animate={{ width: isCollapsed ? '80px' : '256px' }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className={`h-screen bg-card border-r border-border flex flex-col relative ${
+          isMobile ? 'fixed left-0 top-0 z-50' : 'flex-shrink-0'
+        }`}
+      >
       {/* Collapse Toggle */}
       {isMounted && (
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleCollapse}
-          className="absolute -right-3 top-6 z-10 h-6 w-6 rounded-full border border-border bg-card shadow-sm hover:bg-muted"
+          className="absolute -right-3 top-7 z-10 h-6 w-6 rounded-full border border-border bg-card shadow-sm hover:bg-muted"
         >
           {isCollapsed ? (
             <ChevronRight className="h-3 w-3" />
@@ -204,6 +248,7 @@ const DashboardSidebar: React.FC = () => {
         )}
       </div>
     </motion.aside>
+    </>
   );
 };
 

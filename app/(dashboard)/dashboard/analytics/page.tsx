@@ -100,7 +100,7 @@ const AnalyticsPage: React.FC = () => {
                 <CardTitle>Weekly Trend</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64">
+                <div className="h-80 sm:h-64">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={weeklyData}>
                       <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
@@ -127,7 +127,7 @@ const AnalyticsPage: React.FC = () => {
                 <CardTitle>Completion Distribution</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="h-64 flex items-center justify-center">
+                <div className="h-80 sm:h-64 flex items-center justify-center">
                   {pieData.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
@@ -175,7 +175,7 @@ const AnalyticsPage: React.FC = () => {
               <CardTitle>Tours Comparison</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-72">
+              <div className="h-96 sm:h-72">
                 {barData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={barData}>
