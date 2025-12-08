@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeProvider } from "@/context/theme-provider";
+import { AuthProvider } from "@/context/auth-context";
 import { ToursProvider } from "@/context/ToursContext";
 
 const poppins = Poppins({
@@ -22,13 +24,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${poppins.variable} font-sans antialiased`}>
-        <ToursProvider>
+    <html lang="en" suppressHydrationWarning>
+      <AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <body className={`${poppins.variable} font-sans antialiased`}>
+            <ToursProvider>
           {children}
-        </ToursProvider>
+            </ToursProvider>
         <Toaster />
-      </body>
+          </body>
+        </ThemeProvider>
+      </AuthProvider>
     </html>
   );
 }

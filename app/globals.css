@@ -80,6 +80,12 @@
   }
 }
 
+@layer components{
+  button{
+    @apply cursor-pointer
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
