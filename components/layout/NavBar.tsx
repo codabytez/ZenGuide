@@ -73,10 +73,10 @@ const pathname =  usePathname();
               </>
             ) : ( */}
               <>
-                <Link href="/login">
+                <Link href="/auth/login">
                   <Button variant="ghost" size="sm">Login</Button>
                 </Link>
-                <Link href="/signup">
+                <Link href="/auth/signup">
                   <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                     Get Started
                   </Button>
@@ -127,10 +127,10 @@ const pathname =  usePathname();
                   </>
                 ) : ( */}
                   <>
-                    <Link href="/login" className="flex-1">
+                    <Link href="/auth/login" className="flex-1">
                       <Button variant="outline" className="w-full" size="sm">Login</Button>
                     </Link>
-                    <Link href="/signup" className="flex-1">
+                    <Link href="/auth/signup" className="flex-1">
                       <Button className="w-full" size="sm">Get Started</Button>
                     </Link>
                   </>

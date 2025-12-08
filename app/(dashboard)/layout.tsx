@@ -1,13 +1,11 @@
-'use client';
-
 import React from 'react';
-import DashboardSidebar from './DashboardSidebar';
+import DashboardSidebar from '@/components/dashboard/DashboardSidebar';
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   // TODO: Add authentication check with Convex
   // const isAuthenticated = false;
   // if (!isAuthenticated) {
@@ -22,6 +20,4 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       </main>
     </div>
   );
-};
-
-export default DashboardLayout;
+}
