@@ -14,23 +14,47 @@ const DashboardSidebar: React.FC = () => {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Load collapsed state from localStorage after mount
+  // Check if mobile on mount and window resize
   useEffect(() => {
-    const saved = localStorage.getItem('sidebar-collapsed');
-    if (saved !== null) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsCollapsed(saved === 'true');
-    }
-    // Set mounted after reading localStorage to avoid hydration mismatch
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      
+      // On mobile, check saved state or default to collapsed
+      if (mobile) {
+        const saved = localStorage.getItem('sidebar-collapsed-mobile');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsCollapsed(saved === 'false' ? false : true); // Default collapsed on mobile
+      } else {
+        const saved = localStorage.getItem('sidebar-collapsed-desktop');
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setIsCollapsed(saved === 'true');
+      }
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
     requestAnimationFrame(() => setIsMounted(true));
+
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Save collapsed state to localStorage when it changes
+  // Auto-collapse sidebar on mobile when pathname changes
+  useEffect(() => {
+    if (isMobile && isMounted) {
+      setIsCollapsed(true);
+      localStorage.setItem('sidebar-collapsed-mobile', 'true');
+    }
+  }, [pathname, isMobile, isMounted]);
+
+  // Save collapsed state to localStorage when it changes (separate keys for mobile/desktop)
   const toggleCollapse = () => {
     const newState = !isCollapsed;
     setIsCollapsed(newState);
-    localStorage.setItem('sidebar-collapsed', String(newState));
+    const storageKey = isMobile ? 'sidebar-collapsed-mobile' : 'sidebar-collapsed-desktop';
+    localStorage.setItem(storageKey, String(newState));
   };
   
   // TODO: Replace with actual user data from Convex
@@ -66,7 +90,7 @@ const DashboardSidebar: React.FC = () => {
           variant="ghost"
           size="icon"
           onClick={toggleCollapse}
-          className="absolute -right-3 top-6 z-10 h-6 w-6 rounded-full border border-border bg-card shadow-sm hover:bg-muted"
+          className="absolute -right-3 top-7 z-10 h-6 w-6 rounded-full border border-border bg-card shadow-sm hover:bg-muted"
         >
           {isCollapsed ? (
             <ChevronRight className="h-3 w-3" />
