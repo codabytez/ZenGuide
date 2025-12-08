@@ -17,13 +17,13 @@ An interactive onboarding tour platform that helps users discover features and u
 Install dependencies:
 
 ```bash
-npm install --legacy-peer-deps
+pnpm install
 ```
 
 Run the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000)
@@ -51,5 +51,3 @@ components/
 - Dark mode support
 - Fully responsive
 - Authentication with Convex
-
-
