@@ -8,22 +8,47 @@ import { Label } from "@/components/ui/label";
 import { Compass, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
-import { useAuth } from "@/context/auth-context";
+import { useAuthActions } from "@convex-dev/auth/react";
 
 const Login: React.FC = () => {
-  const { login, isLoading } = useAuth();
+  const { signIn } = useAuthActions();
   const router = useRouter();
   const [email, setEmail] = useState("demo@tourguide.app");
   const [password, setPassword] = useState("demo123");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("")
 
-  const handleSubmit = async (e: React.FormEvent) => {
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     try {
+//       await login(email, password);
+//       toast.success("Welcome back!");
+//       router.push("/dashboard");
+//     } catch (error) {
+//       toast.error("Login failed");
+//     }
+//   };
+
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+
     try {
-      await login(email, password);
-      toast.success("Welcome back!");
-      router.push("/dashboard");
-    } catch (error) {
-      toast.error("Login failed");
+      await signIn("password", {
+        email,
+        password,
+        flow: "signIn",
+      });
+      // Redirect or show success message
+      toast.success("Login successful")
+      router.push('/dashboard')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign in failed");
+        toast.error("Signup failed: " + (err instanceof Error ? err.message : "Unknown error"));
+
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -101,8 +126,8 @@ const Login: React.FC = () => {
               Forgot Password?
             </Link>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Signing in...

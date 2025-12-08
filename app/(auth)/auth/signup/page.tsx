@@ -8,23 +8,48 @@ import { Label } from "@/components/ui/label";
 import { Compass, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
-import { useAuth } from "@/context/auth-context";
+import { useAuthActions } from "@convex-dev/auth/react";
 
 const Signup: React.FC = () => {
-  const { signup, isLoading } = useAuth();
+     const { signIn } = useAuthActions();
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     try {
+//       await signup(email, password, name);
+//       toast.success("Account created successfully!");
+//       router.push("/dashboard");
+//     } catch (error) {
+//       toast.error("Signup failed");
+//     }
+//   };
+
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
+
     try {
-      await signup(email, password, name);
-      toast.success("Account created successfully!");
-      router.push("/dashboard");
-    } catch (error) {
-      toast.error("Signup failed");
+      await signIn("password", {
+        email,
+        password,
+        name,
+        flow: "signUp",
+      });
+      // Redirect or show success message
+        toast.success("Account created successfully!");
+        router.push("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign up failed");
+        toast.error("Signup failed: " + (err instanceof Error ? err.message : "Unknown error"));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -129,8 +154,8 @@ const Signup: React.FC = () => {
               />
             </div>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? (
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                   Creating account...

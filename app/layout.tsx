@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/context/theme-provider";
 import { AuthProvider } from "@/context/auth-context";
 import { ToursProvider } from "@/context/ToursContext";
+import { ConvexProviderWrapper } from "@/context/convex-provider";
+
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -24,17 +26,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${poppins.variable} font-sans antialiased`}>
-        <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="system">
-            <ToursProvider>
-              {children}
-            </ToursProvider>
-            <Toaster />
-          </ThemeProvider>
-        </AuthProvider>
-      </body>
-    </html>
+    <ConvexProviderWrapper>
+          <AuthProvider>
+            <ThemeProvider attribute="class" defaultTheme="system">
+              <html lang="en" suppressHydrationWarning>
+                <body className={`${poppins.variable} font-sans antialiased`}>
+                      <ToursProvider>
+                        {children}
+                      </ToursProvider>
+                      <Toaster />
+                </body>
+              </html>
+            </ThemeProvider>
+          </AuthProvider>
+    </ConvexProviderWrapper>
   );
 }
