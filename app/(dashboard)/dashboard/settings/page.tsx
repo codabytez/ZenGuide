@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from 'next-themes';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,10 +10,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Save, User, Bell, Palette, Shield } from 'lucide-react';
+import { Save, User, Bell, Palette, Shield, Moon, Sun } from 'lucide-react';
 import { toast } from 'sonner';
 
 const SettingsPage: React.FC = () => {
+  const { theme, setTheme } = useTheme();
+  
   // TODO: Get user from Convex auth
   const user = {
     name: 'Demo User',
@@ -101,6 +104,43 @@ const SettingsPage: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Appearance Settings */}
+          <Card className="mb-6">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Palette className="w-5 h-5 text-primary" />
+                <CardTitle>Appearance</CardTitle>
+              </div>
+              <CardDescription>Customize the look and feel</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-foreground">Dark Mode</p>
+                  <p className="text-sm text-muted-foreground">Toggle between light and dark theme</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={theme === 'light' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setTheme('light')}
+                    className="gap-2"
+                  >
+                    <Sun className="w-4 h-4" /> Light
+                  </Button>
+                  <Button
+                    variant={theme === 'dark' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setTheme('dark')}
+                    className="gap-2"
+                  >
+                    <Moon className="w-4 h-4" /> Dark
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Notification Settings */}
           <Card className="mb-6">
             <CardHeader>
@@ -137,7 +177,7 @@ const SettingsPage: React.FC = () => {
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Palette className="w-5 h-5 text-primary" />
-                <CardTitle>Widget Defaults</CardTitle>
+                <CardTitle>Tour Widget Defaults</CardTitle>
               </div>
               <CardDescription>Set default options for new tours</CardDescription>
             </CardHeader>
