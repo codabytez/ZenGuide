@@ -11,7 +11,7 @@ import { Eye, CheckCircle2, SkipForward, TrendingUp } from 'lucide-react';
 
 const AnalyticsPage: React.FC = () => {
   // TODO: Fetch real data from Convex
-  const tours: any[] = [];
+  const tours: { name: string; analytics: { views: number; completions: number; skips: number; avgCompletionRate: number } }[] = [];
 
   const totalStats = tours.reduce(
     (acc, tour) => ({

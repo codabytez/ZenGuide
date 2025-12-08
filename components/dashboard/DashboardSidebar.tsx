@@ -12,15 +12,17 @@ import { Button } from '@/components/ui/button';
 
 const DashboardSidebar: React.FC = () => {
   const pathname = usePathname();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sidebar-collapsed');
+      return saved === 'true';
+    }
+    return false;
+  });
   const [isMounted, setIsMounted] = useState(false);
 
-  // Load collapsed state from localStorage on mount
+  // Set mounted state
   useEffect(() => {
-    const saved = localStorage.getItem('sidebar-collapsed');
-    if (saved !== null) {
-      setIsCollapsed(saved === 'true');
-    }
     setIsMounted(true);
   }, []);
 

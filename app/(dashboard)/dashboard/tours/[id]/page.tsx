@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 
 import {useTours} from "@/context/ToursContext";
 
-import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,14 +106,13 @@ const TourEditor = () => {
   };
 
   return (
-    <DashboardLayout>
-      <div className="p-6 lg:p-8 max-w-4xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          {/* Header */}
-          <div className="flex items-center gap-4 mb-8">
+    <div className="p-6 lg:p-8 max-w-4xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
             <Link href="/dashboard/tours">
               <Button variant="ghost" size="icon">
                 <ArrowLeft className="w-5 h-5" />
@@ -310,7 +308,6 @@ const TourEditor = () => {
           )}
         </motion.div>
       </div>
-    </DashboardLayout>
   );
 };
 
