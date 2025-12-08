@@ -1,4 +1,4 @@
-import { Compass, Github, Twitter } from 'lucide-react';
+import { Compass, Github } from 'lucide-react';
 import { NextPage } from 'next';
 import Link from 'next/link';
 
@@ -21,12 +21,10 @@ const Footer: NextPage = () => {
               Engage users from day one.
             </p>
             <div className="flex gap-3 mt-4">
-              <Link href="https://github.com/ZenGuide" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="https://github.com/codabytez/ZenGuide.git" className="text-muted-foreground hover:text-foreground transition-colors">
                 <Github className="w-5 h-5" />
               </Link>
-              <Link href='https://x.com/ZenGuide' className="text-muted-foreground hover:text-foreground transition-colors">
-                <Twitter className="w-5 h-5" />
-              </Link>
+             
             </div>
           </div>
 
