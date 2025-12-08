@@ -45,7 +45,7 @@ const DashboardOverview: React.FC = () => {
   return (
     <div className="p-6 lg:p-8">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
             <div>
               <h1 className="text-3xl font-display font-bold text-foreground">Dashboard</h1>
               <p className="text-muted-foreground mt-1">
@@ -53,8 +53,8 @@ const DashboardOverview: React.FC = () => {
               </p>
             </div>
 
-            <Link href="/dashboard/tours/new">
-              <Button className="gap-2">
+            <Link href="/dashboard/tours/new" className="sm:ml-auto">
+              <Button className="gap-2 w-full sm:w-auto">
                 <Plus className="w-4 h-4" />
                 New Tour
               </Button>

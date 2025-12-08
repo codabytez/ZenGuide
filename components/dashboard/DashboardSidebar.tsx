@@ -78,12 +78,26 @@ const DashboardSidebar: React.FC = () => {
   };
 
   return (
-    <motion.aside 
-      initial={false}
-      animate={{ width: isCollapsed ? '80px' : '256px' }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="h-screen bg-card border-r border-border flex flex-col relative flex-shrink-0"
-    >
+    <>
+      {/* Backdrop overlay for mobile */}
+      {isMobile && !isCollapsed && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={toggleCollapse}
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+        />
+      )}
+      
+      <motion.aside 
+        initial={false}
+        animate={{ width: isCollapsed ? '80px' : '256px' }}
+        transition={{ duration: 0.3, ease: 'easeInOut' }}
+        className={`h-screen bg-card border-r border-border flex flex-col relative ${
+          isMobile ? 'fixed left-0 top-0 z-50' : 'flex-shrink-0'
+        }`}
+      >
       {/* Collapse Toggle */}
       {isMounted && (
         <Button
@@ -228,6 +242,7 @@ const DashboardSidebar: React.FC = () => {
         )}
       </div>
     </motion.aside>
+    </>
   );
 };
 
