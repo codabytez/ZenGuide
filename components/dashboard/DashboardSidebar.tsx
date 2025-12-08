@@ -17,11 +17,13 @@ const DashboardSidebar: React.FC = () => {
 
   // Load collapsed state from localStorage after mount
   useEffect(() => {
-    setIsMounted(true);
     const saved = localStorage.getItem('sidebar-collapsed');
     if (saved !== null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsCollapsed(saved === 'true');
     }
+    // Set mounted after reading localStorage to avoid hydration mismatch
+    requestAnimationFrame(() => setIsMounted(true));
   }, []);
 
   // Save collapsed state to localStorage when it changes
