@@ -51,6 +51,7 @@ const TourEditor = () => {
   const [isActive, setIsActive] = useState(existingTour?.isActive || false);
   const [steps, setSteps] = useState(existingTour?.steps || []);
   const [copied, setCopied] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   const tourId = existingTour?.id || "";
 
@@ -60,17 +61,25 @@ const TourEditor = () => {
       return;
     }
 
+    setIsSaving(true);
+
     if (isNew) {
       const newTour = createTour(name, description);
       steps.forEach((step) => addStep(newTour.id, step));
       if (isActive) updateTour(newTour.id, { isActive });
 
-      toast.success("Tour created!");
+      toast.success("Tour created successfully!");
+      setIsSaving(false);
 
       router.push(`/dashboard/tours/${newTour.id}`);
     } else {
       updateTour(id, { name, description, isActive, steps });
-      toast.success("Tour saved!");
+      
+      toast.success("Tour saved successfully!", {
+        description: "Your changes have been saved."
+      });
+      
+      setTimeout(() => setIsSaving(false), 500);
     }
   };
 
@@ -125,9 +134,9 @@ const TourEditor = () => {
               </h1>
             </div>
 
-            <Button onClick={handleSave} className="gap-2">
+            <Button onClick={handleSave} disabled={isSaving} className="gap-2">
               <Save className="w-4 h-4" />
-              Save
+              {isSaving ? "Saving..." : "Save"}
             </Button>
           </div>
 
