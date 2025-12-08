@@ -8,8 +8,19 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: #0a8aff;
+  --color-accent: #00c7b1;
+  --color-secondary: #ffb15c;
+  --color-text-dark: #1a1e2c;
+  --color-soft-gray: #f4f7fa;
+  --color-error: #ff4d4f;
+  --color-success: #28c76f;
+  --gradient-start: #f6d365;
+  --gradient-end: #fda085;
+  --color-background-alt: #f4f6f9;
+  --color-text-alt: #1a1f36;
+
+  --font-sans: var(--font-poppins);
 }
 
 @media (prefers-color-scheme: dark) {
