@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/context/theme-provider";
 import { AuthProvider } from "@/context/auth-context";
+import { ToursProvider } from "@/context/ToursContext";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -32,8 +33,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <body className={`${poppins.variable} font-sans antialiased`}>
-            {children}
-            <Toaster />
+            <ToursProvider>
+          {children}
+            </ToursProvider>
+        <Toaster />
           </body>
         </ThemeProvider>
       </AuthProvider>
