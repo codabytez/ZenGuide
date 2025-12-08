@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,18 +45,17 @@ const SettingsPage: React.FC = () => {
   };
 
   return (
-    <DashboardLayout>
-      <div className="p-6 lg:p-8 max-w-3xl">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="mb-8">
-            <h1 className="text-3xl font-display font-bold text-foreground">Settings</h1>
-            <p className="text-muted-foreground mt-1">Manage your account and preferences</p>
-          </div>
+    <div className="p-6 lg:p-8 max-w-3xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="mb-8">
+          <h1 className="text-3xl font-display font-bold text-foreground">Settings</h1>
+          <p className="text-muted-foreground mt-1">Manage your account and preferences</p>
+        </div>
 
-          {/* Profile Settings */}
+        {/* Profile Settings */}
           <Card className="mb-6">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -222,9 +220,8 @@ const SettingsPage: React.FC = () => {
               </Button>
             </CardContent>
           </Card>
-        </motion.div>
-      </div>
-    </DashboardLayout>
+      </motion.div>
+    </div>
   );
 };
 

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, 
@@ -12,7 +11,7 @@ import { Eye, CheckCircle2, SkipForward, TrendingUp } from 'lucide-react';
 
 const AnalyticsPage: React.FC = () => {
   // TODO: Fetch real data from Convex
-  const tours: any[] = [];
+  const tours: { name: string; analytics: { views: number; completions: number; skips: number; avgCompletionRate: number } }[] = [];
 
   const totalStats = tours.reduce(
     (acc, tour) => ({
@@ -58,16 +57,15 @@ const AnalyticsPage: React.FC = () => {
   ];
 
   return (
-    <DashboardLayout>
-      <div className="p-6 lg:p-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="mb-8">
-            <h1 className="text-3xl font-display font-bold text-foreground">Analytics</h1>
-            <p className="text-muted-foreground mt-1">Track your tour performance and user engagement</p>
-          </div>
+    <div className="p-6 lg:p-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className="mb-8">
+          <h1 className="text-3xl font-display font-bold text-foreground">Analytics</h1>
+          <p className="text-muted-foreground mt-1">Track your tour performance and user engagement</p>
+        </div>
 
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -203,9 +201,8 @@ const AnalyticsPage: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        </motion.div>
-      </div>
-    </DashboardLayout>
+      </motion.div>
+    </div>
   );
 };
 
