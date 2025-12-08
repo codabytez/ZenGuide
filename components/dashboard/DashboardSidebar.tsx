@@ -70,7 +70,13 @@ const DashboardSidebar: React.FC = () => {
     { path: '/dashboard/settings', icon: Settings, label: 'Settings' },
   ];
 
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => {
+    if (path === '/dashboard') {
+      return pathname === path;
+    }
+    // For other paths, check if the current path starts with the nav path
+    return pathname.startsWith(path);
+  };
 
   const handleLogout = () => {
     // TODO: Implement logout with Convex
