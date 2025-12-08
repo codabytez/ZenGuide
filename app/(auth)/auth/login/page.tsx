@@ -93,6 +93,14 @@ const Login: React.FC = () => {
               />
             </div>
 
+            {/* ✅ Forgot Password link added here */}
+            <Link
+              href="/forgot-password"
+              className="text-sm text-primary hover:underline block"
+            >
+              Forgot Password?
+            </Link>
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
                 <>
