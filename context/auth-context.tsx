@@ -47,6 +47,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   });
   const [isLoading, setIsLoading] = useState(false);
 
+  // Load user from localStorage on client only
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("demo-auth-user");
+      if (saved) setUser(JSON.parse(saved));
+    }
+  }, []);
+
   const login = useCallback(async (email: string, password: string) => {
     setIsLoading(true);
     // Simulate API call
@@ -54,7 +62,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const loggedInUser = { ...DEMO_USER, email };
     setUser(loggedInUser);
-    localStorage.setItem("demo-auth-user", JSON.stringify(loggedInUser));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("demo-auth-user", JSON.stringify(loggedInUser));
+    }
     setIsLoading(false);
   }, []);
 
@@ -65,7 +75,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const newUser = { ...DEMO_USER, email, name };
       setUser(newUser);
-      localStorage.setItem("demo-auth-user", JSON.stringify(newUser));
+      if (typeof window !== "undefined") {
+        localStorage.setItem("demo-auth-user", JSON.stringify(newUser));
+      }
       setIsLoading(false);
     },
     []
@@ -73,7 +85,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = useCallback(() => {
     setUser(null);
-    localStorage.removeItem("demo-auth-user");
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("demo-auth-user");
+    }
   }, []);
 
   return (
