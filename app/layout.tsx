@@ -1,13 +1,13 @@
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/context/auth-context";
+import { ConvexProviderWrapper } from "@/context/convex-provider";
+import { ThemeProvider } from "@/context/theme-provider";
+import { ToursProvider } from "@/context/ToursContext";
+import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/context/theme-provider";
-import { AuthProvider } from "@/context/auth-context";
-import { ToursProvider } from "@/context/ToursContext";
-import { ConvexProviderWrapper } from "@/context/convex-provider";
-import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 
 
 const poppins = Poppins({
