@@ -1,19 +1,21 @@
 "use client";
 
-import { useAuth } from "@/context/auth-context";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Input } from "@/components/ui/input";
+import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
 
-export default function ResetPassword() {
+export default function ResetPasswordPage() {
   const { resetPassword, isLoading } = useAuth();
   const params = useSearchParams();
-  const email = params.get("email");
+
+  // email passed from verify-otp step  
+  const email = params.get("email") ?? "";
+
   const [password, setPassword] = useState("");
 
-  async function submit(e) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
     await resetPassword(email, password);
     window.location.href = "/auth/reset-password/success";
@@ -21,27 +23,21 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen flex justify-center items-center p-8">
-      <motion.div
-        className="w-full max-w-md space-y-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="text-3xl font-bold">Reset Password</h1>
+      <form onSubmit={submit} className="w-full max-w-md space-y-4">
+        <h1 className="text-2xl font-bold">Reset Password</h1>
 
-        <form className="space-y-4" onSubmit={submit}>
-          <Input
-            type="password"
-            placeholder="New password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+        <Input
+          type="password"
+          placeholder="Enter new password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
 
-          <Button className="w-full" disabled={isLoading}>
-            {isLoading ? "Updating..." : "Reset Password"}
-          </Button>
-        </form>
-      </motion.div>
+        <Button className="w-full" disabled={isLoading}>
+          {isLoading ? "Updating..." : "Reset Password"}
+        </Button>
+      </form>
     </div>
   );
 }

@@ -1,48 +1,42 @@
 "use client";
 
-import { useAuth } from "@/context/auth-context";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Input } from "@/components/ui/input";
+import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
 
 export default function VerifyOtp() {
-  const { verifyOtp, isLoading } = useAuth();
+  const { verifyResetOtp, isLoading } = useAuth();
+
   const params = useSearchParams();
-  const email = params.get("email");
+  const email = params.get("email") ?? "";
   const [code, setCode] = useState("");
 
-  async function submit(e) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    await verifyOtp({ email, code });
+    await verifyResetOtp(email, code);
     window.location.href = `/auth/reset-password?email=${email}`;
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8">
-      <motion.div
-        className="w-full max-w-md space-y-6"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <h1 className="text-3xl font-bold mb-4">Verify OTP</h1>
-        <p className="text-muted-foreground">OTP sent to: {email}</p>
+    <div className="min-h-screen flex justify-center items-center p-8">
+      <form onSubmit={submit} className="w-full max-w-md space-y-4">
+        <h1 className="text-xl font-bold">Verify OTP</h1>
 
-        <form className="space-y-4" onSubmit={submit}>
-          <Input
-            placeholder="123456"
-            maxLength={6}
-            required
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-          />
+        <Input
+          type="text"
+          placeholder="Enter 6-digit code"
+          maxLength={6}
+          required
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+        />
 
-          <Button className="w-full" disabled={isLoading}>
-            {isLoading ? "Verifying..." : "Continue"}
-          </Button>
-        </form>
-      </motion.div>
+        <Button type="submit" disabled={isLoading} className="w-full">
+          {isLoading ? "Verifying..." : "Verify OTP"}
+        </Button>
+      </form>
     </div>
   );
 }

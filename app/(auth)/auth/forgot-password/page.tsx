@@ -7,12 +7,12 @@ import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 
 export default function ForgotPasswordPage() {
-  const { requestReset, isLoading } = useAuth();
+  const { requestPasswordReset, isLoading } = useAuth();
   const [email, setEmail] = useState("");
 
-  async function submit(e) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
-    await requestReset({ email });
+    await requestPasswordReset(email);
     window.location.href = `/auth/forgot-password/verify-otp?email=${email}`;
   }
 

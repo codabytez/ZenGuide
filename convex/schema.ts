@@ -3,25 +3,24 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 const schema = defineSchema({
-  // Built-in Convex Auth users table
   ...authTables,
 
-  // Password storage mapped to Convex Auth user IDs
-  userPasswords: defineTable({
-    userId: v.id("users"),
-    passwordHash: v.string(),
-  }).index("by_user", ["userId"]),
-
-  // OTP reset codes
-  resetCodes: defineTable({
+  // PASSWORD RESET OTP STORAGE
+  passwordResets: defineTable({
     email: v.string(),
-    code: v.string(),
-    expiresAt: v.number(),
+    otp: v.string(),
+    createdAt: v.number(),
   }).index("by_email", ["email"]),
 
-  // --------------------------
-  // Tours table
-  // --------------------------
+  // USERS
+  users: defineTable({
+    email: v.string(),
+    passwordHash: v.optional(v.string()),
+    name: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("email", ["email"]),
+
+  // TOURS
   tours: defineTable({
     userId: v.id("users"),
     name: v.string(),
@@ -33,7 +32,7 @@ const schema = defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_active", ["userId", "isActive"]),
 
-  // Tour steps
+  // TOUR STEPS
   tourSteps: defineTable({
     tourId: v.id("tours"),
     stepId: v.string(),
@@ -54,38 +53,7 @@ const schema = defineSchema({
     .index("by_tour", ["tourId"])
     .index("by_tour_order", ["tourId", "order"]),
 
-  // Analytics
-  tourAnalytics: defineTable({
-    tourId: v.id("tours"),
-    views: v.number(),
-    completions: v.number(),
-    skips: v.number(),
-    avgCompletionRate: v.number(),
-    weeklyViews: v.optional(v.array(v.number())),
-    weeklyCompletions: v.optional(v.array(v.number())),
-    lastUpdated: v.number(),
-  }).index("by_tour", ["tourId"]),
-
-  // Events
-  tourEvents: defineTable({
-    tourId: v.id("tours"),
-    eventType: v.union(
-      v.literal("view"),
-      v.literal("start"),
-      v.literal("complete"),
-      v.literal("skip"),
-      v.literal("step_view")
-    ),
-    stepId: v.optional(v.string()),
-    sessionId: v.optional(v.string()),
-    timestamp: v.number(),
-    visitorId: v.optional(v.string()),
-  })
-    .index("by_tour", ["tourId"])
-    .index("by_tour_date", ["tourId", "timestamp"])
-    .index("by_session", ["sessionId"]),
-
-  // User settings
+  // SETTINGS
   userSettings: defineTable({
     userId: v.id("users"),
     emailNotifications: v.boolean(),
@@ -95,22 +63,6 @@ const schema = defineSchema({
     theme: v.optional(v.union(v.literal("light"), v.literal("dark"))),
     updatedAt: v.number(),
   }).index("by_user", ["userId"]),
-
-  // Embeds
-  tourEmbeds: defineTable({
-    tourId: v.id("tours"),
-    userId: v.id("users"),
-    domain: v.string(),
-    primaryColor: v.optional(v.string()),
-    showAvatar: v.boolean(),
-    autoStart: v.boolean(),
-    allowSkip: v.boolean(),
-    isActive: v.boolean(),
-    createdAt: v.number(),
-  })
-    .index("by_tour", ["tourId"])
-    .index("by_user", ["userId"])
-    .index("by_domain", ["domain"]),
 });
 
 export default schema;

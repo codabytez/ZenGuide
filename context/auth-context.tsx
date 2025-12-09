@@ -4,102 +4,114 @@ import { createContext, useContext, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-const AuthContext = createContext(null);
+// ----------------------------
+// Types
+// ----------------------------
+interface AuthContextType {
+  signup: (email: string, password: string, name?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<any>;
+  requestPasswordReset: (email: string) => Promise<any>;
+  verifyResetOtp: (email: string, otp: string) => Promise<any>;
+  resetPassword: (email: string, password: string) => Promise<any>;
+  isLoading: boolean;
+}
 
-export function AuthProvider({ children }) {
-  // QUERIES
+// Context MUST NOT be null anymore
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// ----------------------------
+// Provider
+// ----------------------------
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // Convex API calls
+  const requestReset = useMutation(api.reset.requestReset);
+  const verifyOtp = useQuery(api.reset.verifyOtp);
+  const doReset = useMutation(api.reset.resetPassword);
+
   const getUserByEmail = useQuery(api.users.getUserByEmail);
   const getPasswordHash = useQuery(api.users.getPasswordHash);
-
-  // MUTATIONS
   const setPasswordHash = useMutation(api.users.setPasswordHash);
-  const requestReset = useMutation(api.reset.requestReset);
-  const verifyOtpMutation = useMutation(api.reset.verifyOtp);
-  const resetPasswordMutation = useMutation(api.reset.resetPassword);
 
   const [isLoading, setIsLoading] = useState(false);
 
+  // ----------------------------
   // SIGNUP
-  async function signup(email, password) {
+  // ----------------------------
+  const signup = async (email: string, password: string, name?: string) => {
     setIsLoading(true);
 
     const bcrypt = (await import("bcryptjs")).default;
-    const passwordHash = await bcrypt.hash(password, 10);
+    const hash = await bcrypt.hash(password, 10);
 
-    const user = await getUserByEmail({ email });
-    if (!user) {
-      setIsLoading(false);
-      throw new Error("User was not created automatically via Convex Auth.");
-    }
+    // Does user exist?
+    const existing = await getUserByEmail({ email });
+    if (existing) throw new Error("User already exists");
 
+    // Create user
     await setPasswordHash({
-      userId: user._id,
-      passwordHash,
+      userId: existing?._id,
+      passwordHash: hash,
     });
 
     setIsLoading(false);
-  }
+  };
 
+  // ----------------------------
   // LOGIN
-  async function login(email, password) {
+  // ----------------------------
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
 
+    const bcrypt = (await import("bcryptjs")).default;
+
     const user = await getUserByEmail({ email });
-    if (!user) {
-      setIsLoading(false);
-      throw new Error("Invalid email or password");
-    }
+    if (!user) throw new Error("Invalid credentials");
 
     const stored = await getPasswordHash({ userId: user._id });
-    if (!stored) {
-      setIsLoading(false);
-      throw new Error("Password not set");
-    }
+    if (!stored?.passwordHash) throw new Error("Invalid credentials");
 
-    const bcrypt = (await import("bcryptjs")).default;
     const match = await bcrypt.compare(password, stored.passwordHash);
-
-    if (!match) {
-      setIsLoading(false);
-      throw new Error("Invalid email or password");
-    }
+    if (!match) throw new Error("Invalid credentials");
 
     setIsLoading(false);
     return user;
-  }
+  };
 
-  // REQUEST RESET
-  async function requestPasswordReset(email) {
+  // ----------------------------
+  // REQUEST OTP
+  // ----------------------------
+  const requestPasswordReset = async (email: string) => {
     return await requestReset({ email });
-  }
+  };
 
+  // ----------------------------
   // VERIFY OTP
-  async function verifyResetOtp(email, code) {
-    return await verifyOtpMutation({ email, code });
-  }
+  // ----------------------------
+  const verifyResetOtp = async (email: string, otp: string) => {
+    return await verifyOtp({ email, otp });
+  };
 
+  // ----------------------------
   // RESET PASSWORD
-  async function resetPassword(email, newPassword) {
+  // ----------------------------
+  const resetPassword = async (email: string, password: string) => {
     setIsLoading(true);
+    const bcrypt = (await import("bcryptjs")).default;
+
+    const hash = await bcrypt.hash(password, 10);
 
     const user = await getUserByEmail({ email });
-    if (!user) {
-      setIsLoading(false);
-      throw new Error("Account not found");
-    }
-
-    const bcrypt = (await import("bcryptjs")).default;
-    const passwordHash = await bcrypt.hash(newPassword, 10);
+    if (!user) throw new Error("User not found");
 
     await setPasswordHash({
       userId: user._id,
-      passwordHash,
+      passwordHash: hash,
     });
 
-    await resetPasswordMutation({ email, newPassword });
+    await doReset({ email, newPassword: password });
 
     setIsLoading(false);
-  }
+  };
 
   return (
     <AuthContext.Provider
@@ -115,6 +127,14 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export const useAuth = () => useContext(AuthContext);
+// ----------------------------
+// Hook
+// ----------------------------
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx)
+    throw new Error("useAuth must be used inside <AuthProvider>");
+  return ctx;
+};
