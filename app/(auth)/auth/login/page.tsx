@@ -9,6 +9,7 @@ import { Compass, ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { getAuthErrorMessage } from "@/lib/auth-errors";
 
 const Login: React.FC = () => {
   const { signIn } = useAuthActions();
@@ -34,6 +35,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     setLoading(true);
     setError("");
 
+    const toastId=toast.loading("Signing in...");
     try {
       await signIn("password", {
         email,
@@ -41,11 +43,12 @@ const handleSubmit = async (e: React.FormEvent) => {
         flow: "signIn",
       });
       // Redirect or show success message
-      toast.success("Login successful")
+      toast.success("Login successful", { id: toastId });
       router.push('/dashboard')
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Sign in failed");
-        toast.error("Signup failed: " + (err instanceof Error ? err.message : "Unknown error"));
+      const friendlyMessage = getAuthErrorMessage(err);
+    setError(friendlyMessage);
+    toast.error(friendlyMessage, { id: toastId });
 
     } finally {
       setLoading(false);
