@@ -1,172 +1,140 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import bcrypt from "bcryptjs";
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-}
+const AuthContext = createContext(null);
 
-interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
+export function AuthProvider({ children }) {
+  // QUERIES
+  const getUserByEmail = useQuery(api.users.getUserByEmail);
+  const getPasswordHash = useQuery(api.users.getPasswordHash);
 
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => void;
+  // MUTATIONS
+  const setPasswordHash = useMutation(api.users.setPasswordHash);
+  const requestReset = useMutation(api.reset.requestReset);
+  const verifyOtp = useMutation(api.reset.verifyOtp);
+  const resetPasswordMutation = useMutation(api.reset.resetPassword);
 
-  resetRequest: (email: string) => Promise<void>;
-  verifyOtp: (email: string, otp: string) => Promise<void>;
-  resetPassword: (email: string, newPassword: string) => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
-};
-
-// Mock user for demo only
-const DEMO_USER: User = {
-  id: "demo-user-001",
-  email: "demo@tourguide.app",
-  name: "Demo User",
-};
-
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // -------------------------------------------
+  // -----------------------------
+  // SIGN UP
+  // -----------------------------
+  async function signup(email, password) {
+    setIsLoading(true);
+
+    // Create Convex Auth user automatically
+    const user = await getUserByEmail({ email });
+    if (user) {
+      setIsLoading(false);
+      throw new Error("Account already exists.");
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Create Convex auth user manually if needed (depends on your flow)
+    // For now, we'll rely on your existing signup flow
+
+    // Store hashed password
+    await setPasswordHash({
+      userId: user?._id, // If you have your own signup mutation, update this
+      passwordHash,
+    });
+
+    setIsLoading(false);
+  }
+
+  // -----------------------------
   // LOGIN
-  // -------------------------------------------
-  const login = useCallback(async (email: string, password: string) => {
+  // -----------------------------
+  async function login(email, password) {
     setIsLoading(true);
 
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        setUser({ ...DEMO_USER, email });
-        setIsLoading(false);
-        resolve();
-      }, 800);
-    });
-  }, []);
+    // Step 1 — Check if user exists
+    const user = await getUserByEmail({ email });
+    if (!user) {
+      setIsLoading(false);
+      throw new Error("Invalid email or password.");
+    }
 
-  // -------------------------------------------
-  // SIGNUP
-  // -------------------------------------------
-  const signup = useCallback(
-    async (email: string, password: string, name: string) => {
-      setIsLoading(true);
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          setUser({ id: "new-user", email, name });
-          setIsLoading(false);
-          resolve();
-        }, 800);
-      });
-    },
-    []
-  );
+    // Step 2 — Get stored password hash
+    const passwordRow = await getPasswordHash({ userId: user._id });
+    if (!passwordRow) {
+      setIsLoading(false);
+      throw new Error("No password set for this account.");
+    }
 
-  // -------------------------------------------
-  // LOGOUT
-  // -------------------------------------------
-  const logout = useCallback(() => {
-    setUser(null);
-  }, []);
+    // Step 3 — Validate password
+    const match = await bcrypt.compare(password, passwordRow.passwordHash);
+    if (!match) {
+      setIsLoading(false);
+      throw new Error("Invalid email or password.");
+    }
 
-  // -------------------------------------------
-  // PASSWORD RESET — STEP 1: SEND OTP
-  // -------------------------------------------
-  const resetRequest = async (email: string) => {
+    setIsLoading(false);
+    return user;
+  }
+
+  // -----------------------------
+  // REQUEST OTP
+  // -----------------------------
+  async function requestPasswordReset(email) {
+    return await requestReset({ email });
+  }
+
+  // -----------------------------
+  // VERIFY OTP
+  // -----------------------------
+  async function verifyResetOtp(email, code) {
+    return await verifyOtp({ email, code });
+  }
+
+  // -----------------------------
+  // RESET PASSWORD
+  // -----------------------------
+  async function resetPassword(email, newPassword) {
     setIsLoading(true);
 
-    return new Promise<void>((resolve, reject) => {
-      setTimeout(() => {
-        if (!email) {
-          setIsLoading(false);
-          reject(new Error("Invalid email"));
-          return;
-        }
+    // Step 1 — Fetch user
+    const user = await getUserByEmail({ email });
+    if (!user) {
+      setIsLoading(false);
+      throw new Error("Account not found.");
+    }
 
-        // mock: store email & otp locally
-        localStorage.setItem("reset_email", email);
-        localStorage.setItem("otp", "123456");
+    // Step 2 — Hash password
+    const passwordHash = await bcrypt.hash(newPassword, 10);
 
-        setIsLoading(false);
-        resolve();
-      }, 800);
+    // Step 3 — Save to userPasswords table
+    await setPasswordHash({
+      userId: user._id,
+      passwordHash,
     });
-  };
 
-  // -------------------------------------------
-  // PASSWORD RESET — STEP 2: VERIFY OTP
-  // -------------------------------------------
-  const verifyOtp = async (email: string, otp: string) => {
-    setIsLoading(true);
+    // Step 4 — Remove OTP via resetPassword mutation
+    await resetPasswordMutation({ email, newPassword });
 
-    return new Promise<void>((resolve, reject) => {
-      const storedEmail = localStorage.getItem("reset_email");
-      const storedOtp = localStorage.getItem("otp");
-
-      setTimeout(() => {
-        if (email === storedEmail && otp === storedOtp) {
-          setIsLoading(false);
-          resolve();
-        } else {
-          setIsLoading(false);
-          reject(new Error("Invalid OTP"));
-        }
-      }, 800);
-    });
-  };
-
-  // -------------------------------------------
-  // PASSWORD RESET — STEP 3: SAVE NEW PASSWORD
-  // -------------------------------------------
-  const resetPassword = async (email: string, newPassword: string) => {
-    setIsLoading(true);
-
-    return new Promise<void>((resolve, reject) => {
-      const storedEmail = localStorage.getItem("reset_email");
-
-      setTimeout(() => {
-        if (email === storedEmail) {
-          // cleanup mock storage
-          localStorage.removeItem("otp");
-          localStorage.removeItem("reset_email");
-
-          setIsLoading(false);
-          resolve();
-        } else {
-          setIsLoading(false);
-          reject(new Error("Password reset failed"));
-        }
-      }, 800);
-    });
-  };
+    setIsLoading(false);
+  }
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        isAuthenticated: !!user,
-        isLoading,
-        login,
         signup,
-        logout,
-        resetRequest,
-        verifyOtp,
+        login,
+        requestPasswordReset,
+        verifyResetOtp,
         resetPassword,
+        isLoading,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
+export const useAuth = () => useContext(AuthContext);
