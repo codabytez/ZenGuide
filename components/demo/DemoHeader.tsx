@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 import { Rocket } from "lucide-react";
 
 export default function DemoHeader({
-  onStartTour,
+  onStartTourAction,
 }: {
-  onStartTour: () => void;
+  onStartTourAction: () => void;
 }) {
   return (
     <header className="relative overflow-hidden">
@@ -63,7 +63,7 @@ export default function DemoHeader({
 
         {/* CTA Button */}
         <motion.button
-          onClick={onStartTour}
+          onClick={onStartTourAction}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-primary-foreground"
           style={{
             background:

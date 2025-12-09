@@ -35,8 +35,8 @@ export const getTourById = query({
         title: s.title,
         description: s.description,
         order: s.order,
-        targetSelector: s.targetSelector,
-        position: s.position,
+        target: s.targetSelector,
+        placement: s.position || "bottom",
       })),
     };
   },
@@ -61,6 +61,8 @@ export const trackWidgetEvent = mutation({
     visitorId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const now = Date.now();
+
     // Record the event
     await ctx.db.insert("tourEvents", {
       tourId: args.tourId,
@@ -68,91 +70,56 @@ export const trackWidgetEvent = mutation({
       stepId: args.stepId,
       sessionId: args.sessionId,
       visitorId: args.visitorId,
-      timestamp: Date.now(),
+      timestamp: now,
     });
 
     // Update analytics
-    const analytics = await ctx.db
+    let analytics = await ctx.db
       .query("tourAnalytics")
       .withIndex("by_tour", (q) => q.eq("tourId", args.tourId))
       .first();
 
+    // Create analytics record if it doesn't exist
+    if (!analytics) {
+      console.log("Creating new analytics record for tour:", args.tourId);
+      const analyticsId = await ctx.db.insert("tourAnalytics", {
+        tourId: args.tourId,
+        views: 0,
+        completions: 0,
+        skips: 0,
+        avgCompletionRate: 0,
+        lastUpdated: now,
+      });
+      analytics = await ctx.db.get(analyticsId);
+    }
+
     if (analytics) {
-      const updates: Partial<{
+      const updates: {
         lastUpdated: number;
-        views: number;
-        completions: number;
-        avgCompletionRate: number;
-        skips: number;
-      }> = { lastUpdated: Date.now() };
+        views?: number;
+        completions?: number;
+        skips?: number;
+        avgCompletionRate?: number;
+      } = { lastUpdated: now };
 
       if (args.eventType === "view") {
         updates.views = analytics.views + 1;
+        console.log(`Updated views: ${analytics.views} -> ${updates.views}`);
       } else if (args.eventType === "complete") {
         updates.completions = analytics.completions + 1;
-        if (analytics.views > 0) {
-          updates.avgCompletionRate =
-            ((analytics.completions + 1) / analytics.views) * 100;
-        }
+        const newViews = analytics.views || 1;
+        updates.avgCompletionRate =
+          ((analytics.completions + 1) / newViews) * 100;
+        console.log(`Updated completions: ${analytics.completions} -> ${updates.completions}`);
       } else if (args.eventType === "skip") {
         updates.skips = analytics.skips + 1;
+        console.log(`Updated skips: ${analytics.skips} -> ${updates.skips}`);
       }
 
       await ctx.db.patch(analytics._id, updates);
+      console.log("Analytics updated successfully");
     }
 
     return { success: true };
-  },
-});
-
-/**
- * Get multiple tours by domain (optional - for advanced use cases)
- * Returns all active tours for a specific domain
- */
-export const getToursByDomain = query({
-  args: { domain: v.string() },
-  handler: async (ctx, { domain }) => {
-    // Find tour embeds for this domain
-    const embeds = await ctx.db
-      .query("tourEmbeds")
-      .withIndex("by_domain", (q) => q.eq("domain", domain))
-      .filter((q) => q.eq(q.field("isActive"), true))
-      .collect();
-
-    // Fetch tour data for each embed
-    const tours = await Promise.all(
-      embeds.map(async (embed) => {
-        const tour = await ctx.db.get(embed.tourId);
-        if (!tour || !tour.isActive) return null;
-
-        const steps = await ctx.db
-          .query("tourSteps")
-          .withIndex("by_tour", (q) => q.eq("tourId", embed.tourId))
-          .order("asc")
-          .collect();
-
-        return {
-          tourId: tour._id,
-          name: tour.name,
-          description: tour.description,
-          config: {
-            primaryColor: embed.primaryColor,
-            showAvatar: embed.showAvatar,
-            autoStart: embed.autoStart,
-            allowSkip: embed.allowSkip,
-          },
-          steps: steps.map((s) => ({
-            id: s.stepId,
-            title: s.title,
-            description: s.description,
-            order: s.order,
-            targetSelector: s.targetSelector,
-            position: s.position,
-          })),
-        };
-      })
-    );
-
-    return tours.filter((t) => t !== null);
   },
 });
