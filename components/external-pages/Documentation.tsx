@@ -95,7 +95,7 @@ console.log(state.currentStep, state.progress);`;
                 Documentation
               </h1>
               <p className="text-lg text-muted-foreground mb-12">
-                Everything you need to integrate TourGuide into your application.
+                Everything you need to integrate ZenGuide into your application.
               </p>
             </motion.div>
 
@@ -106,7 +106,7 @@ console.log(state.currentStep, state.progress);`;
                 Getting Started
               </h2>
               <p className="text-muted-foreground mb-4">
-                TourGuide is an embeddable onboarding widget that helps you create 
+                ZenGuide is an embeddable onboarding widget that helps you create 
                 beautiful, interactive tours for your web application. Follow these 
                 steps to get started in minutes.
               </p>

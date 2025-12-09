@@ -28,19 +28,19 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexAuthNextjsServerProvider>
-      <ConvexProviderWrapper>
-        <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="system">
-            <html lang="en" suppressHydrationWarning>
-              <body className={`${poppins.variable} font-sans antialiased`}>
+      <html lang="en" suppressHydrationWarning>
+        <body className={`${poppins.variable} font-sans antialiased`}>
+          <ConvexProviderWrapper>
+            <AuthProvider>
+              <ThemeProvider attribute="class" defaultTheme="system">
                 {children}
                 <Toaster />
                 <Sonner richColors />
-              </body>
-            </html>
-          </ThemeProvider>
-        </AuthProvider>
-      </ConvexProviderWrapper>
+              </ThemeProvider>
+            </AuthProvider>
+          </ConvexProviderWrapper>
+        </body>
+      </html>
     </ConvexAuthNextjsServerProvider>
   );
 }

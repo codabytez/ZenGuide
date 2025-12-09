@@ -87,22 +87,19 @@ const EnhancedAnalytics: React.FC = () => {
       label: 'Total Views',
       value: overview?.totalViews?.toLocaleString() || '0',
       icon: Eye,
-      color: 'text-blue-500',
-      change: '+12%'
+      color: 'text-blue-500'
     },
     {
       label: 'Completions',
       value: overview?.totalCompletions?.toLocaleString() || '0',
       icon: CheckCircle2,
-      color: 'text-green-500',
-      change: '+8%'
+      color: 'text-green-500'
     },
     {
       label: 'Unique Visitors',
       value: overview?.uniqueVisitors?.toLocaleString() || '0',
       icon: Users,
-      color: 'text-purple-500',
-      change: '+15%'
+      color: 'text-purple-500'
     },
     {
       label: 'Avg. Duration',
@@ -110,8 +107,7 @@ const EnhancedAnalytics: React.FC = () => {
         ? `${Math.round(overview.avgSessionDuration / 1000)}s`
         : '0s',
       icon: Clock,
-      color: 'text-amber-500',
-      change: '-3%'
+      color: 'text-amber-500'
     },
   ];
 
@@ -190,7 +186,6 @@ const EnhancedAnalytics: React.FC = () => {
                     <div className={`w-12 h-12 rounded-xl bg-muted flex items-center justify-center ${stat.color}`}>
                       <stat.icon className="w-6 h-6" />
                     </div>
-                    <span className="text-xs font-medium text-green-500">{stat.change}</span>
                   </div>
                   <p className="text-sm text-muted-foreground">{stat.label}</p>
                   <p className="text-2xl font-bold text-foreground mt-1">{stat.value}</p>

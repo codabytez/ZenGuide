@@ -14,7 +14,7 @@ const Footer: NextPage = () => {
               <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-accent flex items-center justify-center">
                 <Compass className="w-4 h-4 text-primary-foreground" />
               </div>
-              <span className="font-display font-bold text-foreground">TourGuide</span>
+              <span className="font-display font-bold text-foreground">ZenGuide</span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-sm">
               Create beautiful, interactive onboarding tours for your web applications. 

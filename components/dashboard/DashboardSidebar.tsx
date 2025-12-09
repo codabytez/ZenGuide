@@ -154,7 +154,7 @@ const DashboardSidebar: React.FC = () => {
                   transition={{ duration: 0.2 }}
                   className="font-display font-bold text-foreground whitespace-nowrap overflow-hidden"
                 >
-                  TourGuide
+                  ZenGuide
                 </motion.span>
               )}
             </AnimatePresence>
