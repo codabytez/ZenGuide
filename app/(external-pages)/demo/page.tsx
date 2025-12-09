@@ -2,7 +2,7 @@
 
 import React from "react";
 import Script from "next/script";
-import { TourProvider } from "@/contexts/TourContext";
+import { TourProvider } from "@/context/TourContext";
 import DemoHeader from "@/components/demo/DemoHeader";
 import FeaturesGrid from "@/components/demo/FeaturesGrid";
 import EmbedCodePreview from "@/components/demo/EmbedCodePreview";

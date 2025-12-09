@@ -3,7 +3,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/context/auth-context";
 import { ConvexProviderWrapper } from "@/context/convex-provider";
 import { ThemeProvider } from "@/context/theme-provider";
-import { ToursProvider } from "@/context/ToursContext";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
@@ -34,9 +33,7 @@ export default function RootLayout({
           <ThemeProvider attribute="class" defaultTheme="system">
             <html lang="en" suppressHydrationWarning>
               <body className={`${poppins.variable} font-sans antialiased`}>
-                <ToursProvider>
-                  {children}
-                </ToursProvider>
+                {children}
                 <Toaster />
                 <Sonner richColors />
               </body>
