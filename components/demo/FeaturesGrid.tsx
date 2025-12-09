@@ -10,11 +10,6 @@ const features = [
     description: "Add to any website with a simple script tag",
   },
   {
-    icon: Sparkles,
-    title: "3D Avatar",
-    description: "Engaging Three.js animated companion",
-  },
-  {
     icon: BarChart3,
     title: "Analytics",
     description: "Track completion rates and user engagement",

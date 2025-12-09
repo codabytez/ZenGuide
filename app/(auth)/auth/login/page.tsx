@@ -77,7 +77,7 @@ const handleSubmit = async (e: React.FormEvent) => {
               <Compass className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-xl text-foreground">
-              TourGuide
+              ZenGuide
             </span>
           </div>
 

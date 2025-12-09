@@ -11,7 +11,6 @@ import {
 // external pages
  export const FEATURES = [
     { icon: Layers, title: 'Multi-Step Tours', desc: 'Create guided experiences with unlimited steps' },
-    { icon: Sparkles, title: '3D Avatars', desc: 'Engage users with animated Three.js avatars' },
     { icon: BarChart3, title: 'Analytics', desc: 'Track completion rates and user behavior' },
     { icon: Code2, title: 'Easy Embed', desc: 'One-line script integration for any website' },
     { icon: Zap, title: 'Fast & Light', desc: 'Optimized bundle for instant loading' },

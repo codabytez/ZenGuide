@@ -28,7 +28,7 @@ export default function AboutPage() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6">
-              About TourGuide
+              About ZenGuide
             </h1>
             <p className="text-lg text-muted-foreground">
               We&apos;re on a mission to make user onboarding delightful. Our platform helps 
