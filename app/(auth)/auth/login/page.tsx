@@ -93,9 +93,9 @@ const Login: React.FC = () => {
               />
             </div>
 
-            {/* ✅ Forgot Password link added here */}
+            {/* ✅ Corrected Forgot Password link */}
             <Link
-              href="/forgot-password"
+              href="/auth/forgot-password"
               className="text-sm text-primary hover:underline block"
             >
               Forgot Password?
