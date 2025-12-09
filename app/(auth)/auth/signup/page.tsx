@@ -21,7 +21,7 @@ const Signup: React.FC = () => {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    
+
     // Import the checkEmailExists query
      const emailExists = useQuery(api.users.checkEmailExists, email ? { email } : "skip");
 
@@ -31,7 +31,7 @@ const Signup: React.FC = () => {
         setError("");
 
         const toastId = toast.loading("Creating account...");
-        
+
         try {
             // Check if email already exists
             if (emailExists) {
@@ -44,7 +44,7 @@ const Signup: React.FC = () => {
                 name,
                 flow: "signUp",
             });
-            
+
             toast.success("Account created successfully!", { id: toastId });
             router.push("/dashboard");
         } catch (err) {
@@ -110,12 +110,7 @@ const Signup: React.FC = () => {
                         Get started with TourGuide for free
                     </p>
 
-                    <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-6">
-                        <p className="text-sm text-primary">
-                            <strong>Demo Mode:</strong> Enter any details to create a demo
-                            account
-                        </p>
-                    </div>
+
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div>

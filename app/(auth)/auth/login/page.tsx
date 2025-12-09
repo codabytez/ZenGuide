@@ -88,11 +88,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             Sign in to your account to continue
           </p>
 
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-3 mb-6">
-            <p className="text-sm text-primary">
-              <strong>Demo Mode:</strong> Use any email/password to sign in
-            </p>
-          </div>
+
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
