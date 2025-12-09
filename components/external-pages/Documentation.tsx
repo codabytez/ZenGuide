@@ -63,8 +63,8 @@ console.log(state.currentStep, state.progress);`;
 
   return (
    <>
-      <div className="mx-auto px-4 py-12">
-        <div className="flex gap-8">
+      <div className="mx-auto px-4 py-12 ">
+        <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
           <aside className="hidden lg:block w-64 shrink-0">
             <div className="sticky top-24">
@@ -132,7 +132,7 @@ console.log(state.currentStep, state.progress);`;
                 <code className="px-1.5 py-0.5 bg-muted rounded text-sm mx-1">&lt;/body&gt;</code> 
                 tag for best performance.
               </p>
-              <div className="relative">
+              <div className="relative  ">
                 <pre className="bg-zinc-900 text-zinc-100 rounded-xl p-4 overflow-x-auto text-sm">
                   <code>{embedCode}</code>
                 </pre>
