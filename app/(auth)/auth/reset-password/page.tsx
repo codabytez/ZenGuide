@@ -15,12 +15,16 @@ export default function ResetPassword() {
   const [pw1, setPw1] = useState("");
   const [pw2, setPw2] = useState("");
 
-  const submit = async (e) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (pw1 !== pw2) return toast.error("Passwords do not match");
 
     try {
+      if (!email) {
+        toast.error("Email is missing");
+        return;
+      }
       await resetPassword(email, pw1);
       router.push("/auth/reset-password/success");
     } catch {
