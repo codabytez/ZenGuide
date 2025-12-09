@@ -14,8 +14,8 @@ import { getAuthErrorMessage } from "@/lib/auth-errors";
 const Login: React.FC = () => {
   const { signIn } = useAuthActions();
   const router = useRouter();
-  const [email, setEmail] = useState("demo@tourguide.app");
-  const [password, setPassword] = useState("demo123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("")
 
@@ -42,9 +42,9 @@ const handleSubmit = async (e: React.FormEvent) => {
         password,
         flow: "signIn",
       });
-      // Redirect or show success message
       toast.success("Login successful", { id: toastId });
-      router.push('/dashboard')
+      // Use window.location for full page reload to sync auth state
+      window.location.href = "/dashboard";
     } catch (err) {
       const friendlyMessage = getAuthErrorMessage(err);
     setError(friendlyMessage);

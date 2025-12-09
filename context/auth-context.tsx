@@ -1,23 +1,9 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  avatar?: string;
-}
+import React, { createContext, useContext, useState } from "react";
 
 interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
   isLoading: boolean;
-
-  login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => void;
-
   resetRequest: (email: string) => Promise<void>;
   verifyOtp: (email: string, otp: string) => Promise<void>;
   resetPassword: (email: string, newPassword: string) => Promise<void>;
@@ -31,55 +17,8 @@ export const useAuth = () => {
   return context;
 };
 
-// Mock user for demo only
-const DEMO_USER: User = {
-  id: "demo-user-001",
-  email: "demo@tourguide.app",
-  name: "Demo User",
-};
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  // -------------------------------------------
-  // LOGIN
-  // -------------------------------------------
-  const login = useCallback(async (email: string, password: string) => {
-    setIsLoading(true);
-
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        setUser({ ...DEMO_USER, email });
-        setIsLoading(false);
-        resolve();
-      }, 800);
-    });
-  }, []);
-
-  // -------------------------------------------
-  // SIGNUP
-  // -------------------------------------------
-  const signup = useCallback(
-    async (email: string, password: string, name: string) => {
-      setIsLoading(true);
-      return new Promise<void>((resolve) => {
-        setTimeout(() => {
-          setUser({ id: "new-user", email, name });
-          setIsLoading(false);
-          resolve();
-        }, 800);
-      });
-    },
-    []
-  );
-
-  // -------------------------------------------
-  // LOGOUT
-  // -------------------------------------------
-  const logout = useCallback(() => {
-    setUser(null);
-  }, []);
 
   // -------------------------------------------
   // PASSWORD RESET — STEP 1: SEND OTP
@@ -155,12 +94,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AuthContext.Provider
       value={{
-        user,
-        isAuthenticated: !!user,
         isLoading,
-        login,
-        signup,
-        logout,
         resetRequest,
         verifyOtp,
         resetPassword,

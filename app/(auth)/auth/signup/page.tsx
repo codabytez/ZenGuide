@@ -46,7 +46,8 @@ const Signup: React.FC = () => {
             });
 
             toast.success("Account created successfully!", { id: toastId });
-            router.push("/dashboard");
+            // Use window.location for full page reload to sync auth state
+            window.location.href = "/dashboard";
         } catch (err) {
             const friendlyMessage = getAuthErrorMessage(err);
             setError(friendlyMessage);
