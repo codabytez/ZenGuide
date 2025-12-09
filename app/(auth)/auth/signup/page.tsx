@@ -10,6 +10,8 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const Signup: React.FC = () => {
     const { signIn } = useAuthActions();
@@ -17,19 +19,11 @@ const Signup: React.FC = () => {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-
-    //   const handleSubmit = async (e: React.FormEvent) => {
-    //     e.preventDefault();
-    //     try {
-    //       await signup(email, password, name);
-    //       toast.success("Account created successfully!");
-    //       router.push("/dashboard");
-    //     } catch (error) {
-    //       toast.error("Signup failed");
-    //     }
-    //   };
+    
+    // Import the checkEmailExists query
+     const emailExists = useQuery(api.users.checkEmailExists, email ? { email } : "skip");
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,14 +31,20 @@ const Signup: React.FC = () => {
         setError("");
 
         const toastId = toast.loading("Creating account...");
+        
         try {
+            // Check if email already exists
+            if (emailExists) {
+                throw new Error("USER_ALREADY_EXISTS");
+            }
+
             await signIn("password", {
                 email,
                 password,
                 name,
                 flow: "signUp",
             });
-            // Redirect or show success message
+            
             toast.success("Account created successfully!", { id: toastId });
             router.push("/dashboard");
         } catch (err) {
