@@ -15,7 +15,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="flex h-screen overflow-hidden bg-background">
       <DashboardSidebar />
-      <main className="flex-1 overflow-auto">
+      <main className="flex-1 overflow-auto md:ml-0">
         {children}
       </main>
     </div>

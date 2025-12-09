@@ -112,7 +112,7 @@ const SettingsPage: React.FC = () => {
               <CardDescription>Customize the look and feel</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                   <p className="font-medium text-foreground">Dark Mode</p>
                   <p className="text-sm text-muted-foreground">Toggle between light and dark theme</p>
@@ -122,7 +122,7 @@ const SettingsPage: React.FC = () => {
                     variant={theme === 'light' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setTheme('light')}
-                    className="gap-2"
+                    className="gap-2 flex-1 sm:flex-none"
                   >
                     <Sun className="w-4 h-4" /> Light
                   </Button>
@@ -130,7 +130,7 @@ const SettingsPage: React.FC = () => {
                     variant={theme === 'dark' ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setTheme('dark')}
-                    className="gap-2"
+                    className="gap-2 flex-1 sm:flex-none"
                   >
                     <Moon className="w-4 h-4" /> Dark
                   </Button>
