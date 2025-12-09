@@ -1,7 +1,8 @@
 import { mutation } from "../_generated/server";
-import bcrypt from "bcryptjs";
 
 export default mutation(async ({ db }, { email, newPassword }) => {
+  const bcrypt = (await import("bcryptjs")).default;
+
   const user = await db
     .query("users")
     .withIndex("email", (q) => q.eq("email", email))
@@ -11,7 +12,16 @@ export default mutation(async ({ db }, { email, newPassword }) => {
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
 
-  await db.patch(user._id, { passwordHash });
+  const existingPass = await db
+    .query("userPasswords")
+    .withIndex("by_user", (q) => q.eq("userId", user._id))
+    .first();
+
+  if (existingPass) {
+    await db.patch(existingPass._id, { passwordHash });
+  } else {
+    await db.insert("userPasswords", { userId: user._id, passwordHash });
+  }
 
   const codes = await db
     .query("resetCodes")
@@ -19,7 +29,7 @@ export default mutation(async ({ db }, { email, newPassword }) => {
     .collect();
 
   for (const c of codes) {
-    await db.delete(c._Id);
+    await db.delete(c._id);
   }
 
   return { ok: true };

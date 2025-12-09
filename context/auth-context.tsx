@@ -3,7 +3,6 @@
 import { createContext, useContext, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import bcrypt from "bcryptjs";
 
 const AuthContext = createContext(null);
 
@@ -15,107 +14,88 @@ export function AuthProvider({ children }) {
   // MUTATIONS
   const setPasswordHash = useMutation(api.users.setPasswordHash);
   const requestReset = useMutation(api.reset.requestReset);
-  const verifyOtp = useMutation(api.reset.verifyOtp);
+  const verifyOtpMutation = useMutation(api.reset.verifyOtp);
   const resetPasswordMutation = useMutation(api.reset.resetPassword);
 
   const [isLoading, setIsLoading] = useState(false);
 
-  // -----------------------------
-  // SIGN UP
-  // -----------------------------
+  // SIGNUP
   async function signup(email, password) {
     setIsLoading(true);
 
-    // Create Convex Auth user automatically
-    const user = await getUserByEmail({ email });
-    if (user) {
-      setIsLoading(false);
-      throw new Error("Account already exists.");
-    }
-
-    // Hash password
+    const bcrypt = (await import("bcryptjs")).default;
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create Convex auth user manually if needed (depends on your flow)
-    // For now, we'll rely on your existing signup flow
+    const user = await getUserByEmail({ email });
+    if (!user) {
+      setIsLoading(false);
+      throw new Error("User was not created automatically via Convex Auth.");
+    }
 
-    // Store hashed password
     await setPasswordHash({
-      userId: user?._id, // If you have your own signup mutation, update this
+      userId: user._id,
       passwordHash,
     });
 
     setIsLoading(false);
   }
 
-  // -----------------------------
   // LOGIN
-  // -----------------------------
   async function login(email, password) {
     setIsLoading(true);
 
-    // Step 1 — Check if user exists
     const user = await getUserByEmail({ email });
     if (!user) {
       setIsLoading(false);
-      throw new Error("Invalid email or password.");
+      throw new Error("Invalid email or password");
     }
 
-    // Step 2 — Get stored password hash
-    const passwordRow = await getPasswordHash({ userId: user._id });
-    if (!passwordRow) {
+    const stored = await getPasswordHash({ userId: user._id });
+    if (!stored) {
       setIsLoading(false);
-      throw new Error("No password set for this account.");
+      throw new Error("Password not set");
     }
 
-    // Step 3 — Validate password
-    const match = await bcrypt.compare(password, passwordRow.passwordHash);
+    const bcrypt = (await import("bcryptjs")).default;
+    const match = await bcrypt.compare(password, stored.passwordHash);
+
     if (!match) {
       setIsLoading(false);
-      throw new Error("Invalid email or password.");
+      throw new Error("Invalid email or password");
     }
 
     setIsLoading(false);
     return user;
   }
 
-  // -----------------------------
-  // REQUEST OTP
-  // -----------------------------
+  // REQUEST RESET
   async function requestPasswordReset(email) {
     return await requestReset({ email });
   }
 
-  // -----------------------------
   // VERIFY OTP
-  // -----------------------------
   async function verifyResetOtp(email, code) {
-    return await verifyOtp({ email, code });
+    return await verifyOtpMutation({ email, code });
   }
 
-  // -----------------------------
   // RESET PASSWORD
-  // -----------------------------
   async function resetPassword(email, newPassword) {
     setIsLoading(true);
 
-    // Step 1 — Fetch user
     const user = await getUserByEmail({ email });
     if (!user) {
       setIsLoading(false);
-      throw new Error("Account not found.");
+      throw new Error("Account not found");
     }
 
-    // Step 2 — Hash password
+    const bcrypt = (await import("bcryptjs")).default;
     const passwordHash = await bcrypt.hash(newPassword, 10);
 
-    // Step 3 — Save to userPasswords table
     await setPasswordHash({
       userId: user._id,
       passwordHash,
     });
 
-    // Step 4 — Remove OTP via resetPassword mutation
     await resetPasswordMutation({ email, newPassword });
 
     setIsLoading(false);

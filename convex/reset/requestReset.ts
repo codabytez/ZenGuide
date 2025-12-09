@@ -19,7 +19,7 @@ export default mutation(async ({ db }, { email }) => {
 
   await db.insert("resetCodes", { email, code: otp, expiresAt });
 
-  console.log("OTP for", email, "=>", otp);
+  console.log("OTP:", otp);
 
   return { ok: true };
 });
