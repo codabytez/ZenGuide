@@ -21,7 +21,6 @@ import {
   Code2,
   Map,
   Loader2,
-  X,
   Calendar,
   Activity,
 } from "lucide-react";
@@ -69,7 +68,7 @@ const ToursPage = () => {
     t.name.toLowerCase().includes(search.toLowerCase())
   ) || [];
 
-  const previewTour = tours.find((t) => t.id === previewTourId);
+  const previewTour = tours?.find((t) => t.id === previewTourId);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -127,32 +126,7 @@ const ToursPage = () => {
             </Button>
           </Link>
         </div>
-          <div>
-            <h1 className="text-3xl font-display font-bold text-foreground">
-              Tours
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Manage your onboarding tours
-            </p>
-          </div>
-          <Link href="/dashboard/tours/new">
-            <Button className="gap-2">
-              <Plus className="w-4 h-4" />
-              New Tour
-            </Button>
-          </Link>
-        </div>
 
-        {/* SEARCH */}
-        <div className="relative mb-6 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search tours..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
-        </div>
         {/* SEARCH */}
         <div className="relative mb-6 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -172,47 +146,7 @@ const ToursPage = () => {
               <p className="text-muted-foreground mb-4">
                 {search ? "No tours match your search" : "No tours yet"}
               </p>
-        {/* GRID */}
-        {filteredTours.length === 0 ? (
-          <Card>
-            <CardContent className="py-16 text-center">
-              <Map className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground mb-4">
-                {search ? "No tours match your search" : "No tours yet"}
-              </p>
 
-              {!search && (
-                <Link href="/dashboard/tours/new">
-                  <Button>Create Your First Tour</Button>
-                </Link>
-              )}
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredTours.map((tour, i) => (
-              <motion.div
-                key={tour.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-              >
-                <Card className="group hover:shadow-lg transition-shadow">
-                  <CardContent className="p-5">
-                    {/* STATUS + MENU */}
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-2.5 h-2.5 rounded-full ${
-                            tour.isActive
-                              ? "bg-green-500"
-                              : "bg-muted-foreground"
-                          }`}
-                        />
-                        <span className="text-xs text-muted-foreground">
-                          {tour.isActive ? "Active" : "Inactive"}
-                        </span>
-                      </div>
               {!search && (
                 <Link href="/dashboard/tours/new">
                   <Button>Create Your First Tour</Button>
@@ -353,7 +287,7 @@ const ToursPage = () => {
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase mb-2">
                     Description
                   </h3>
-                  <p className="text-foreground">{previewTour.description}</p>
+                  <p className="text-foreground">{previewTour.description || "No description"}</p>
                 </div>
 
                 {/* ANALYTICS */}
@@ -403,19 +337,19 @@ const ToursPage = () => {
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase mb-3">
                     Tour Steps
                   </h3>
-                  <div className="space-y-3">
+                  <div className="space-y-2 sm:space-y-3">
                     {previewTour.steps.map((step, index) => (
                       <Card key={step.id}>
-                        <CardContent className="p-4">
-                          <div className="flex gap-3">
-                            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-sm">
+                        <CardContent className="p-3 sm:p-4">
+                          <div className="flex gap-2 sm:gap-3">
+                            <div className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-xs sm:text-sm">
                               {index + 1}
                             </div>
-                            <div className="flex-1">
-                              <h4 className="font-semibold text-foreground mb-1">
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-foreground mb-1 text-sm sm:text-base">
                                 {step.title}
                               </h4>
-                              <p className="text-sm text-muted-foreground mb-2">
+                              <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                                 {step.description}
                               </p>
                             </div>
