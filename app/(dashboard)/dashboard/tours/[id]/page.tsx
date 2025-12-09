@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, Reorder } from "framer-motion";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -83,6 +83,12 @@ const TourEditor = () => {
     setIsSaving(true);
 
     try {
+      // Update order property for all steps based on current position
+      const updatedSteps = steps.map((step, index) => ({
+        ...step,
+        order: index,
+      }));
+
       if (isNew) {
         // Create new tour
         const newTourId = await createTour({
@@ -93,7 +99,7 @@ const TourEditor = () => {
         // Save steps
         await saveSteps({
           tourId: newTourId,
-          steps: steps,
+          steps: updatedSteps,
         });
 
         // Update active status if needed
@@ -118,7 +124,7 @@ const TourEditor = () => {
         // Save steps
         await saveSteps({
           tourId: id as Id<"tours">,
-          steps: steps,
+          steps: updatedSteps,
         });
 
         toast.success("Tour saved successfully!", {
@@ -152,6 +158,15 @@ const TourEditor = () => {
 
   const handleDeleteStep = (stepId: string) => {
     setSteps(steps.filter((s) => s.id !== stepId));
+  };
+
+  const handleReorder = (newOrder: typeof steps) => {
+    // Update the steps array with new order
+    const reorderedSteps = newOrder.map((step, index) => ({
+      ...step,
+      order: index,
+    }));
+    setSteps(reorderedSteps);
   };
 
   const copyEmbedCode = () => {
@@ -277,16 +292,22 @@ const TourEditor = () => {
                 </Button>
               </div>
             ) : (
-              <div className="space-y-4">
+              <Reorder.Group
+                axis="y"
+                values={steps}
+                onReorder={handleReorder}
+                className="space-y-4"
+              >
                 {steps.map((step, index) => (
-                  <motion.div
+                  <Reorder.Item
                     key={step.id}
-                    className="flex gap-3 p-4 rounded-lg border border-border bg-muted/30"
+                    value={step}
+                    className="flex gap-3 p-4 rounded-lg border border-border bg-muted/30 cursor-grab active:cursor-grabbing"
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
                   >
-                    <div className="flex items-center text-muted-foreground cursor-grab">
+                    <div className="flex items-center text-muted-foreground">
                       <GripVertical className="w-5 h-5" />
                     </div>
 
@@ -331,9 +352,9 @@ const TourEditor = () => {
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
-                  </motion.div>
+                  </Reorder.Item>
                 ))}
-              </div>
+              </Reorder.Group>
             )}
 
             {steps.length > 0 && steps.length < 5 && (
