@@ -13,9 +13,13 @@ export default function VerifyOtp() {
   const { verifyOtp, isLoading } = useAuth();
   const [otp, setOtp] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      if (!email) {
+        toast.error("Email is missing");
+        return;
+      }
       await verifyOtp(email, otp);
       router.push("/auth/reset-password?email=" + email);
     } catch {
