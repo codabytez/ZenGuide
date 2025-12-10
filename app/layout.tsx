@@ -20,6 +20,15 @@ export const metadata: Metadata = {
   title: "ZenGuide Onboarding Tour Platform",
   description:
     "An interactive platform to guide users through onboarding tours seamlessly.",
+    icons: {
+    icon: [
+      { url: './images/image.png' },
+    ],
+    shortcut: ['/images/image.png'],
+    apple: [
+      { url: '/images/image.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
 export default function RootLayout({
