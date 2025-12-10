@@ -26,7 +26,7 @@ const item = {
 
 
 const TEAM = [
-  { name: "Lisan Al-Gaib", role: "AI Developer", icon: "LA", desc: "Wannabe Frontend Dev Shipping Beans to Production." },
+  { name: "Lisan Al-Gaib", role: "Code Breaker", icon: "LA", desc: "Wannabe Frontend Dev Shipping Beans to Production." },
   { name: "TBNelly", role: "Fronted Engineer", icon: "TB" },
   { name: "Chindindu Codes", role: "Frontend Engineer", icon: "CC", },
   { name: "Charlz", role: "Frontend Engineer", icon: "C" },
