@@ -5,19 +5,16 @@ import { motion } from "framer-motion";
 import { Copy, Check } from "lucide-react";
 
 const embedCode = `<!-- Onboarding Tour Widget -->
-<script src="https://cdn.example.com/tour-widget.js"></script>
-<script>
-  TourWidget.init({
-    tourId: 'your-tour-id',
-    steps: [
-      { id: 'step-1', title: 'Welcome', description: '...' },
-      { id: 'step-2', title: 'Feature', description: '...' },
-      // Add more steps...
-    ],
-    showAvatar: true,
-    theme: 'dark'
-  });
-</script>`;
+<Script
+        src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+        strategy="afterInteractive"
+        data-tour-id="kh7dw5smxjrbw7epxskr37xzd97wy72e"
+        data-auto-start="false"
+        data-position="bottom-right"
+        data-theme="light"
+        data-show-avatar="true"
+        data-avatar-position="center"
+      />`;
 
 export default function EmbedCodePreview() {
   const [copied, setCopied] = useState(false);

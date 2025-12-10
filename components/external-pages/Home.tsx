@@ -167,7 +167,7 @@ export default function Home(){
               Ready to Improve User Onboarding?
             </h2>
             <p className="text-muted-foreground mb-8">
-              Join hundreds of teams using TourGuide to create exceptional user experiences.
+              Join hundreds of teams using ZenGuide to create exceptional user experiences.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/signup">
