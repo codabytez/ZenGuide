@@ -91,7 +91,7 @@ Add the following script to your HTML to load the ZenGuide widget:
 
 ```html
 <Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="your-tour-id-here"
     data-auto-start="true"
 />
@@ -110,7 +110,7 @@ Add the following script to your HTML to load the ZenGuide widget:
 
   <!-- ZenGuide Widget -->
   <Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="your-tour-id-here"
     data-auto-start="true"
 />

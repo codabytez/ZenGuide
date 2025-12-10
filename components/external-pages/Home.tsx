@@ -3,23 +3,23 @@ import { Button } from '@/components/ui/button';
 import { FEATURES, STEPS } from '@/lib/constants/homepage-constant';
 import { motion } from 'framer-motion';
 import {
-    ArrowRight,
-    CheckCircle2,
-    Compass,
-    Sparkles
+  ArrowRight,
+  CheckCircle2,
+  Compass,
+  Sparkles
 } from 'lucide-react';
 import Link from 'next/link';
 
 
-export default function Home(){
- 
+export default function Home() {
+
   return (
     <>
-    <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-accent/5" />
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl" />
-        
+
         <div className="container mx-auto px-4 py-24 md:py-32 relative">
           <motion.div
             className="max-w-4xl mx-auto text-center"
@@ -142,7 +142,7 @@ export default function Home(){
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15 }}
               >
-                <div className="text-5xl font-display font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-4">
+                <div className="text-5xl font-display font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent mb-4">
                   {step.num}
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">{step.title}</h3>
@@ -178,8 +178,8 @@ export default function Home(){
           </motion.div>
         </div>
       </section>
-            </>
-  
+    </>
+
   );
 };
 

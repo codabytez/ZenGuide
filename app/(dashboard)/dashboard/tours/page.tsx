@@ -79,7 +79,7 @@ const ToursPage = () => {
 
   const copyEmbedCode = (id: string) => {
     const code = `<Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="${id}"
     data-auto-start="${userSettings?.defaultAutoStart}"
     data-show-avatar="${userSettings?.defaultShowAvatar}"

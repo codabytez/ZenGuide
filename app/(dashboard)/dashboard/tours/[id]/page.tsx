@@ -187,7 +187,7 @@ const TourEditor = () => {
 
   const copyEmbedCode = () => {
     const code = `<Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="${id}"
     data-auto-start="${userSettings?.defaultAutoStart}"
     data-show-avatar="${userSettings?.defaultShowAvatar}"
@@ -461,7 +461,7 @@ const TourEditor = () => {
 
                 <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 text-sm overflow-x-auto">
                   {`  <Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="${id}"
     data-auto-start="${userSettings?.defaultAutoStart}"
     data-show-avatar="${userSettings?.defaultShowAvatar}"

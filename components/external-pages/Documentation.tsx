@@ -1,8 +1,8 @@
 'use client'
 import { Button } from '@/components/ui/button';
-import { FAQ, SECTIONS } from '@/lib/constants/docs-contants';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Book, Check, Code2, Copy, HelpCircle, Settings, Zap, ChevronDown } from 'lucide-react';
+import { FAQ, GETTING_STARTED_STEPS, SECTIONS } from '@/lib/constants/docs-contants';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Book, Check, ChevronDown, Code2, Copy, HelpCircle, Settings, Zap } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Documentation() {
@@ -18,7 +18,7 @@ export default function Documentation() {
 
   const embedCode = `<!-- Onboarding Tour Widget -->
 <Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="kh7dw5smxjrbw7epxskr37xzd97wy72e"
     data-auto-start="false"
 />`;
@@ -42,7 +42,7 @@ window.TourGuide.stop();`;
       <div className="mx-auto px-4 py-12 ">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
-          <aside className="hidden lg:block w-64 shrink-0">
+          <aside className="hidden lg:block w-64 shrink-0 ">
             <div className="sticky top-24">
               <h3 className="font-semibold text-foreground mb-4">Documentation</h3>
               <nav className="space-y-1">
@@ -82,17 +82,12 @@ window.TourGuide.stop();`;
                 Getting Started
               </h2>
               <p className="text-muted-foreground mb-4">
-                TourGuide is an embeddable onboarding widget that helps you create
-                beautiful, interactive tours for your web application. Follow these
+                ZenGuide is an onboarding widget that helps you create interactive tours for your websites. Follow these
                 steps to get started in minutes.
               </p>
               <div className="bg-muted/50 rounded-xl p-6 border border-border/50">
                 <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
-                  <li>Create an account and access your dashboard</li>
-                  <li>Create a new tour and add your steps (minimum 5)</li>
-                  <li>Copy the embed code for your tour</li>
-                  <li>Paste the code into your website&apos;s HTML</li>
-                  <li>Your tour is live! Monitor analytics in the dashboard</li>
+                  {GETTING_STARTED_STEPS?.map(step => <li key={step.id}>{step.title}</li>)}
                 </ol>
               </div>
             </section>
@@ -240,7 +235,7 @@ window.TourGuide.stop();`;
                   <h3 className="font-semibold text-foreground mb-2">E-commerce Onboarding</h3>
                   <pre className="bg-zinc-900 text-zinc-100 rounded-xl p-4 overflow-x-auto text-sm">
                     <code>{`<Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="ecom-onboarding-123"
     data-auto-start="true"
     data-show-avatar="true"
@@ -252,7 +247,7 @@ window.TourGuide.stop();`;
                   <h3 className="font-semibold text-foreground mb-2">SaaS Product Tour</h3>
                   <pre className="bg-zinc-900 text-zinc-100 rounded-xl p-4 overflow-x-auto text-sm">
                     <code>{`<Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="saas-product-tour-456"
     data-auto-start="false"
     data-show-avatar="false"
