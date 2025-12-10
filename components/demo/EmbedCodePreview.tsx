@@ -6,7 +6,7 @@ import { Copy, Check } from "lucide-react";
 
 const embedCode = `<!-- Onboarding Tour Widget -->
 <Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="kh7dw5smxjrbw7epxskr37xzd97wy72e"
     data-auto-start="false"
 />`;

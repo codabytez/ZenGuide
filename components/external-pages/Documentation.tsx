@@ -18,7 +18,7 @@ export default function Documentation() {
 
   const embedCode = `<!-- Onboarding Tour Widget -->
 <Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="kh7dw5smxjrbw7epxskr37xzd97wy72e"
     data-auto-start="false"
 />`;
@@ -235,7 +235,7 @@ window.TourGuide.stop();`;
                   <h3 className="font-semibold text-foreground mb-2">E-commerce Onboarding</h3>
                   <pre className="bg-zinc-900 text-zinc-100 rounded-xl p-4 overflow-x-auto text-sm">
                     <code>{`<Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="ecom-onboarding-123"
     data-auto-start="true"
     data-show-avatar="true"
@@ -247,7 +247,7 @@ window.TourGuide.stop();`;
                   <h3 className="font-semibold text-foreground mb-2">SaaS Product Tour</h3>
                   <pre className="bg-zinc-900 text-zinc-100 rounded-xl p-4 overflow-x-auto text-sm">
                     <code>{`<Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="saas-product-tour-456"
     data-auto-start="false"
     data-show-avatar="false"
