@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Compass, ArrowLeft, Loader2 } from "lucide-react";
+import { Compass, ArrowLeft, Loader2, Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -13,38 +13,70 @@ import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import Image from "next/image";
-import { Eye, EyeOff } from 'lucide-react'
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+// Zod validation schema
+const signupSchema = z.object({
+    name: z
+        .string()
+        .min(1, "Name is required")
+        .max(50, "Name must be less than 50 characters")
+        .regex(/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces"),
+    email: z
+        .string()
+        .min(1, "Email is required")
+        .email("Please enter a valid email address"),
+    password: z
+        .string()
+        .min(8, "Password must be at least 8 characters")
+        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+        .regex(/[0-9]/, "Password must contain at least one number")
+        .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
+});
+
+type SignupFormData = z.infer<typeof signupSchema>;
 
 const Signup: React.FC = () => {
     const { signIn } = useAuthActions();
     const router = useRouter();
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
-    // Import the checkEmailExists query
-     const emailExists = useQuery(api.users.checkEmailExists, email ? { email } : "skip");
+    const {
+        register,
+        handleSubmit,
+        watch,
+        formState: { errors },
+    } = useForm<SignupFormData>({
+        resolver: zodResolver(signupSchema),
+        mode: "all",
+    });
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const emailValue = watch("email");
+    const emailExists = useQuery(
+        api.users.checkEmailExists,
+        emailValue ? { email: emailValue } : "skip"
+    );
+
+    const onSubmit = async (data: SignupFormData) => {
         setLoading(true);
-        setError("");
-
         const toastId = toast.loading("Creating account...");
 
         try {
             // Check if email already exists
             if (emailExists) {
-                throw new Error("USER_ALREADY_EXISTS");
+                toast.error("An account with this email already exists", { id: toastId });
+                setLoading(false);
+                return;
             }
 
             await signIn("password", {
-                email,
-                password,
-                name,
+                email: data.email,
+                password: data.password,
+                name: data.name,
                 flow: "signUp",
             });
 
@@ -52,7 +84,6 @@ const Signup: React.FC = () => {
             router.push("/dashboard");
         } catch (err) {
             const friendlyMessage = getAuthErrorMessage(err);
-            setError(friendlyMessage);
             toast.error(friendlyMessage, { id: toastId });
         } finally {
             setLoading(false);
@@ -101,11 +132,11 @@ const Signup: React.FC = () => {
                         <div className="w-10 h-10 flex items-center justify-center">
                             <div className="relative w-15 h-15 shrink-0">
                                 <Image
-                                src="/images/image.png"    
-                                alt="ZenGuide Logo"
-                                fill               
-                                className="object-contain"
-                                priority             
+                                    src="/images/image.png"
+                                    alt="ZenGuide Logo"
+                                    fill
+                                    className="object-contain"
+                                    priority
                                 />
                             </div>
                         </div>
@@ -121,20 +152,27 @@ const Signup: React.FC = () => {
                         Get started with ZenGuide for free
                     </p>
 
-
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                         <div>
                             <Label htmlFor="name">Full Name</Label>
                             <Input
                                 id="name"
                                 type="text"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                {...register("name")}
                                 placeholder="Zen Guide"
-                                required
-                                className="mt-1.5"
+                                className={`mt-1.5 ${errors.name ? "border-red-500" : ""}`}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleSubmit(onSubmit)();
+                                    }
+                                }}
                             />
+                            {errors.name && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {errors.name.message}
+                                </p>
+                            )}
                         </div>
 
                         <div>
@@ -142,42 +180,68 @@ const Signup: React.FC = () => {
                             <Input
                                 id="email"
                                 type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                {...register("email")}
                                 placeholder="zen@example.com"
-                                required
-                                className="mt-1.5"
+                                className={`mt-1.5 ${errors.email ? "border-red-500" : ""}`}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleSubmit(onSubmit)();
+                                    }
+                                }}
                             />
+                            {errors.email && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {errors.email.message}
+                                </p>
+                            )}
+                            {emailExists && !errors.email && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    This email is already registered
+                                </p>
+                            )}
                         </div>
 
                         <div>
-                        <Label htmlFor="password">Password</Label>
-                        <div className="relative mt-1.5">
-                            <Input
-                            id="password"
-                            type={showPassword ? "text" : "password"}
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                            required
-                            className="pr-10"
-                            />
-                            <button
-                            type="button" 
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                            aria-label={showPassword ? "Hide password" : "Show password"}
-                            >
-                            {showPassword ? (
-                                <EyeOff className="w-4 h-4" />
-                            ) : (
-                                <Eye className="w-4 h-4" />
+                            <Label htmlFor="password">Password</Label>
+                            <div className="relative mt-1.5">
+                                <Input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    {...register("password")}
+                                    placeholder="••••••••"
+                                    className={`pr-10 ${errors.password ? "border-red-500" : ""}`}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            e.preventDefault();
+                                            handleSubmit(onSubmit)();
+                                        }
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                    aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="w-4 h-4" />
+                                    ) : (
+                                        <Eye className="w-4 h-4" />
+                                    )}
+                                </button>
+                            </div>
+                            {errors.password && (
+                                <p className="text-sm text-red-500 mt-1">
+                                    {errors.password.message}
+                                </p>
                             )}
-                            </button>
-                        </div>
                         </div>
 
-                        <Button type="submit" className="w-full" disabled={loading}>
+                        <Button
+                            className="w-full"
+                            disabled={loading || emailExists}
+                        >
                             {loading ? (
                                 <>
                                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
