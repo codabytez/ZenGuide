@@ -1,11 +1,9 @@
-export default function Success() {
+export default function ResetSuccess() {
   return (
-    <div className="min-h-screen flex justify-center items-center">
-      <div className="text-center space-y-4">
-        <h1 className="text-3xl font-bold">Password Reset Successful</h1>
-        <a href="/auth/login" className="text-primary underline">
-          Back to Login
-        </a>
+    <div className="min-h-screen flex items-center justify-center p-8">
+      <div className="w-full max-w-md text-center">
+        <h1 className="text-2xl font-bold mb-4">Password reset</h1>
+        <p>Your password was successfully reset. You can now sign in.</p>
       </div>
     </div>
   );

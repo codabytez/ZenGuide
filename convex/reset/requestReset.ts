@@ -1,25 +1,36 @@
 import { mutation } from "../_generated/server";
+import { v } from "convex/values";
+import crypto from "crypto";
 
-function generateOtp() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
+export default mutation({
+  args: { email: v.string() },
+  handler: async ({ db }, { email }) => {
+    // secure 6-digit OTP
+    const code = crypto.randomInt(100000, 1000000).toString();
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
 
-export default mutation(async ({ db }, { email }) => {
-  const otp = generateOtp();
-  const expiresAt = Date.now() + 10 * 60 * 1000;
+    // remove previous codes for this email
+    const previous = await db.query("resetCodes")
+      .withIndex("by_email", (q) => q.eq("email", email))
+      .collect();
 
-  const existing = await db
-    .query("resetCodes")
-    .withIndex("by_email", (q) => q.eq("email", email))
-    .collect();
+    for (const p of previous) {
+      await db.delete(p._id);
+    }
 
-  for (const e of existing) {
-    await db.delete(e._id);
-  }
+    await db.insert("resetCodes", {
+      email,
+      code,
+      expiresAt,
+      createdAt: Date.now(),
+    });
 
-  await db.insert("resetCodes", { email, code: otp, expiresAt });
+    // Do NOT log OTP in production
+    if (process.env.NODE_ENV === "development") {
+      console.log("OTP for", email, code);
+    }
 
-  console.log("OTP:", otp);
-
-  return { ok: true };
+    // TODO: call an email-sending service (Resend/SendGrid) here to deliver code.
+    return { ok: true };
+  },
 });
