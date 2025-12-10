@@ -9,6 +9,7 @@ A comprehensive onboarding tour platform built with Next.js, Convex, and modern 
 - [Overview](#overview)
 - [Features](#features)
 - [Tech Stack](#tech-stack)
+- [Widget Integration](#widget-integration)
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
@@ -17,7 +18,6 @@ A comprehensive onboarding tour platform built with Next.js, Convex, and modern 
 - [Scripts](#scripts)
 - [Architecture](#architecture)
 - [Building for Production](#building-for-production)
-- [Testing](#testing)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
@@ -34,11 +34,13 @@ The Onboarding Tour Platform is a full-stack application that allows product tea
 ## Features
 
 ### Authentication
+
 - User signup and login
 - Password reset flow with OTP verification
 - Secure session management via middleware
 
 ### Dashboard
+
 - **Main Dashboard** - Overview of tours and metrics
 - **Tours Management** - Create, edit, and delete tours
 - **Individual Tour Editor** - Detailed tour configuration
@@ -46,6 +48,7 @@ The Onboarding Tour Platform is a full-stack application that allows product tea
 - **Settings** - Account and application settings
 
 ### Public Pages
+
 - **Landing Page** - Marketing homepage
 - **About** - Company information
 - **Demo** - Interactive product demo
@@ -71,6 +74,61 @@ The Onboarding Tour Platform is a full-stack application that allows product tea
 | **Linting** | ESLint |
 | **Formatting** | Prettier |
 | **Package Manager** | pnpm |
+
+---
+
+## Widget Integration
+
+The ZenGuide widget allows you to embed onboarding tours into any website or application.
+
+### Widget Repository
+
+🔗 **Widget Source Code**: [github.com/codabytez/zenguide-widget](https://github.com/codabytez/zenguide-widget)
+
+### CDN Installation
+
+Add the following script to your HTML to load the ZenGuide widget:
+
+```html
+<Script
+    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    data-tour-id="your-tour-id-here"
+    data-auto-start="true"
+/>
+```
+
+### Quick Start
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My App</title>
+</head>
+<body>
+  <!-- Your app content -->
+
+  <!-- ZenGuide Widget -->
+  <Script
+    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    data-tour-id="your-tour-id-here"
+    data-auto-start="true"
+/>
+</body>
+</html>
+```
+
+### Configuration Options
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `data-tour-id` | string | Yes | The unique identifier for the tour to load. |
+| `data-auto-start` | boolean | No | Whether to start the tour automatically on load. Default is `true`. |
+| `data-position` | string | No | Position of the widget on the screen (e.g., `bottom-right`, `top-left`). Default is `bottom-right`. |
+| `data-show-avatar` | boolean | No | Whether to display the 3D avatar animation. Default is `true`. |
+| `data-avatar-position` | string | No | Position of the avatar (e.g., `center`, `left`, `right`). Default is `center`. |
+
+For more details, see the [Widget Documentation](https://zen-guide-pi.vercel.app/docs) or the [Widget Repository](https://github.com/codabytez/zenguide-widget).
 
 ---
 
@@ -153,8 +211,8 @@ git --version
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-org/onboarding-tour-platform.git
-cd onboarding-tour-platform
+git clone https://github.com/codabytez/ZenGuide
+cd ZenGuide
 ```
 
 ### 2. Install Dependencies
@@ -195,16 +253,6 @@ Create a `.env.local` file in the root directory with the following variables:
 CONVEX_DEPLOYMENT=your-convex-deployment
 NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
 
-# Authentication (if using external auth provider)
-AUTH_SECRET=your-auth-secret
-NEXT_PUBLIC_AUTH_URL=http://localhost:3000
-
-# Analytics (optional)
-NEXT_PUBLIC_ANALYTICS_ID=your-analytics-id
-
-# API Keys (if applicable)
-API_KEY=your-api-key
-
 # App Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 NEXT_PUBLIC_APP_NAME=Onboarding Tour Platform
@@ -216,13 +264,6 @@ NEXT_PUBLIC_APP_NAME=Onboarding Tour Platform
 |----------|-------------|
 | `CONVEX_DEPLOYMENT` | Your Convex deployment identifier |
 | `NEXT_PUBLIC_CONVEX_URL` | Public Convex URL for client-side access |
-
-### Optional Variables
-
-| Variable | Description |
-|----------|-------------|
-| `AUTH_SECRET` | Secret for signing authentication tokens |
-| `NEXT_PUBLIC_ANALYTICS_ID` | Google Analytics or similar tracking ID |
 
 ---
 
@@ -254,6 +295,9 @@ The application will be available at [http://localhost:3000](http://localhost:30
 |-----|-------------|
 | `http://localhost:3000` | Main application |
 | `http://localhost:3000/dashboard` | Dashboard |
+| `http://localhost:3000/dashboard/tours` | Tours management |
+| `http://localhost:3000/dashboard/analytics` | Analytics page |
+| `http://localhost:3000/dashboard/settings` | Settings page |
 | `http://localhost:3000/auth/login` | Login page |
 | `http://localhost:3000/auth/signup` | Signup page |
 | `http://localhost:3000/demo` | Interactive demo |
@@ -276,8 +320,8 @@ Available scripts in `package.json`:
 | `format` | `pnpm format` | Format code with Prettier |
 | `format:check` | `pnpm format:check` | Check formatting |
 | `type-check` | `pnpm type-check` | Run TypeScript compiler check |
-| `convex dev` | `pnpm convex dev` | Run Convex in development mode |
-| `convex deploy` | `pnpm convex deploy` | Deploy Convex functions to production |
+| `convex dev` | `pnpm convex:dev` | Run Convex in development mode |
+| `convex deploy` | `pnpm convex:deploy` | Deploy Convex functions to production |
 
 ---
 
@@ -296,6 +340,7 @@ The app uses Next.js route groups for logical organization:
 ### Middleware
 
 The `middleware.ts` file handles:
+
 - Authentication verification
 - Protected route redirection
 - Session management
@@ -308,7 +353,7 @@ The `middleware.ts` file handles:
 
 ### Component Architecture
 
-```
+```typescript
 components/
 ├── ui/              # Primitive UI components (buttons, inputs, cards)
 ├── layout/          # Page layouts, navigation, footers
@@ -319,7 +364,7 @@ components/
 
 ### Data Flow
 
-```
+```typescript
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
 │   Client    │────▶│   Convex    │────▶│  Database   │
 │  (Next.js)  │◀────│  Functions  │◀────│  (Convex)   │
@@ -354,8 +399,6 @@ The application can be deployed to:
 
 - **Vercel** (recommended for Next.js)
 - **Netlify**
-- **AWS Amplify**
-- **Docker** (custom hosting)
 
 #### Vercel Deployment
 
@@ -374,28 +417,9 @@ vercel --prod
 
 Make sure to set the following environment variables in your hosting platform:
 
-```
+```bash
 CONVEX_DEPLOYMENT=prod:your-deployment
 NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
-AUTH_SECRET=your-production-secret
-```
-
----
-
-## Testing
-
-```bash
-# Run unit tests
-pnpm test
-
-# Run tests in watch mode
-pnpm test:watch
-
-# Run e2e tests
-pnpm test:e2e
-
-# Generate coverage report
-pnpm test:coverage
 ```
 
 ---
@@ -463,13 +487,15 @@ We welcome contributions! Please follow these steps:
 1. **Fork the repository**
 
 2. **Create a feature branch**
+
    ```bash
-   git checkout -b feature/my-feature
+   git checkout -b feat/my-feature
    ```
 
 3. **Make your changes**
 
 4. **Run quality checks**
+
    ```bash
    pnpm lint
    pnpm type-check
@@ -477,11 +503,13 @@ We welcome contributions! Please follow these steps:
    ```
 
 5. **Commit with conventional commits**
+
    ```bash
    git commit -m "feat: add my feature"
    ```
 
 6. **Push and open a PR**
+
    ```bash
    git push origin feature/my-feature
    ```
@@ -512,52 +540,11 @@ We welcome contributions! Please follow these steps:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-```
-MIT License
-
-Copyright (c) 2024 Onboarding Tour Platform
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
 ---
 
 ## Support
 
-- 📧 **Email**: support@onboardingtour.com
-- 💬 **Discord**: [Join our community](https://discord.gg/your-invite)
-- 📖 **Documentation**: [docs.onboardingtour.com](https://docs.onboardingtour.com)
-- 🐛 **Issues**: [GitHub Issues](https://github.com/your-org/onboarding-tour-platform/issues)
+- 📖 **Documentation**: [ZenGuide docs](https://zen-guide-pi.vercel.app/docs)
+- 🐛 **Issues**: [GitHub Issues](https://github.com/codabytez/ZenGuide/issues)
 
 ---
-
-## Acknowledgments
-
-- [Next.js](https://nextjs.org/) - The React Framework
-- [Convex](https://convex.dev/) - Backend platform
-- [Tailwind CSS](https://tailwindcss.com/) - Utility-first CSS
-- [Shadcn/UI](https://ui.shadcn.com/) - UI components
-- [TypeScript](https://www.typescriptlang.org/) - Type safety
-- [pnpm](https://pnpm.io/) - Fast, disk space efficient package manager
-
----
-
-<p align="center">
-  Made with ❤️ by the Onboarding Tour Platform Team
-</p>
