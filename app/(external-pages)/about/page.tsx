@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { Users, Target, Rocket, Heart } from "lucide-react";
+import { Heart, Rocket, Target, Users } from "lucide-react";
 
 export default function AboutPage() {
   const values = [
@@ -11,10 +11,12 @@ export default function AboutPage() {
   ];
 
   const team = [
-    { name: "Alex Chen", role: "Founder & CEO", avatar: "AC" },
-    { name: "Sarah Johnson", role: "Head of Product", avatar: "SJ" },
-    { name: "Mike Davis", role: "Lead Engineer", avatar: "MD" },
-    { name: "Emily Park", role: "Design Lead", avatar: "EP" },
+    { name: "Lisan Al-Gaib", role: "Frontend Engineer", avatar: "LA" },
+    { name: "TBNelly", role: "Fronted Engineer", avatar: "TB" },
+    { name: "Chindindu Codes", role: "Frontend Engineer", avatar: "CC" },
+    { name: "Charlz", role: "Frontend Engineer", avatar: "C" },
+    { name: "GIGO", role: "Frontend Engineer", avatar: "GG" },
+    { name: "Ibn", role: "Frontend Engineer", avatar: "IBN" },
   ];
 
   return (
@@ -28,12 +30,10 @@ export default function AboutPage() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-6">
-              About TourGuide
+              About ZenGuide
             </h1>
             <p className="text-lg text-muted-foreground">
-              We&apos;re on a mission to make user onboarding delightful. Our platform helps 
-              product teams create engaging, interactive tours that turn new users into 
-              power users from day one.
+               ZenGuide is an onboarding widget that helps you create interactive tours for your websites.
             </p>
           </motion.div>
         </div>

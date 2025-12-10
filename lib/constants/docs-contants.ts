@@ -1,18 +1,24 @@
-import { Book, Code2, FileText, HelpCircle, Settings, Zap } from 'lucide-react';
+import { Book, Code2, HelpCircle } from 'lucide-react';
+
+
+export const GETTING_STARTED_STEPS = [
+    { id: 'create-account', title: 'Create an account and access your dashboard' },
+    { id: 'create-tour', title: 'Create a new tour and add your steps (minimum of 5)' },
+    { id: 'copy-embed-code', title: 'Copy the code for your tour' },
+    { id: 'paste-embed-code', title: "Paste the code into your website's HTML or Layout for frameworks" },
+    { id: 'monitor-analytics', title: 'You can then monitor your tours analytics in the dashboard' },
+
+]
 
 
 export const SECTIONS = [
     { id: 'getting-started', icon: Book, title: 'Getting Started' },
     { id: 'installation', icon: Code2, title: 'Installation' },
-    { id: 'configuration', icon: Settings, title: 'Configuration' },
-    { id: 'api', icon: Zap, title: 'API Reference' },
-    { id: 'examples', icon: FileText, title: 'Examples' },
     { id: 'faq', icon: HelpCircle, title: 'FAQ' },
   ];
 
   export const FAQ = [
-                  { q: 'Can I customize the widget appearance?', a: 'Yes! You can customize colors, fonts, and animations through the dashboard or via CSS variables.' },
-                  { q: 'Does it work with React/Vue/Angular?', a: 'TourGuide works with any framework or vanilla JavaScript. Just add the script tag and initialize.' },
-                  { q: 'How does analytics tracking work?', a: 'We automatically track step views, completions, and skips. View detailed analytics in your dashboard.' },
-                  { q: 'Is it mobile-friendly?', a: 'Absolutely! The widget is fully responsive and works great on all devices.' },
+                  { q: 'Does it work with frameworks?', a: 'ZenGuide works with any framework, just create a tour in the dasboard copy and paste the script in your code' },
+                  { q: 'How does analytics tracking work?', a: 'It tracks the view of each steps you created as well as the amount of completed steps' },
+                  { q: 'Is it mobile-friendly?', a: 'Yes, it is mobile friendly it can work on any device.' },
                 ]
