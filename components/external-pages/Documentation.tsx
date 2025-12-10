@@ -1,6 +1,6 @@
 'use client'
 import { Button } from '@/components/ui/button';
-import { FAQ, SECTIONS } from '@/lib/constants/docs-contants';
+import { FAQ, GETTING_STARTED_STEPS, SECTIONS } from '@/lib/constants/docs-contants';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Book, Check, ChevronDown, Code2, Copy, HelpCircle, Settings, Zap } from 'lucide-react';
 import { useState } from 'react';

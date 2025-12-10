@@ -24,9 +24,19 @@ const item = {
   show: { opacity: 1, y: 0 }
 };
 
+
+const TEAM = [
+    { name: "Lisan Al-Gaib", role: "Frontend Engineer", icon: "LA",  desc: "Ex-Stripe. obsessed with API design." },
+    { name: "TBNelly", role: "Fronted Engineer", icon: "TB", desc: "Turned a messy backlog into a roadmap." },
+    { name: "Chindindu Codes", role: "Frontend Engineer", icon: "CC", desc: "Vim user. Breaks things so you don't have to." },
+    { name: "Charlz", role: "Frontend Engineer", icon: "C" , desc: "Believes pixel perfection is a bare minimum."},
+    { name: "GIGO", role: "Frontend Engineer", icon: "GG", desc:'Believes in building locally before pushing codes' },
+    { name: "Ibn", role: "Frontend Engineer", icon: "IBN", desc:"Believes in the power of simplicity." },
+  ];
+
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden">
+     <div className="min-h-screen bg-background text-foreground overflow-hidden">
       
       {/* SECTION 1: The Manifesto (Replaces standard Hero) */}
       <section className="pt-32 pb-16 border-b border-border/40">
@@ -48,13 +58,13 @@ export default function AboutPage() {
                   v1.0 Public Build
                 </div>
                 <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight leading-[0.95] mb-8">
-                  Software shouldn't <br />
+                  Software shouldn&apos;t <br />
                   <span className="text-primary/60">feel like a maze.</span>
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
                   We got tired of watching users sign up and drop off within 60 seconds. 
-                  ZenGuide wasn't born in a boardroom; it was built during a hackathon to fix 
-                  our own broken onboarding flow. Now, it handles the "hello" for 2M+ users.
+                  ZenGuide wasn&apos;t born in a boardroom; it was built during a hackathon to fix 
+                  our own broken onboarding flow. Now, it handles the &lsquo;hello&rsquo; for 2M+ users.
                 </p>
               </motion.div>
             </div>
@@ -126,7 +136,7 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-xl font-bold mb-3">Speed matters</h3>
                 <p className="text-muted-foreground text-sm">
-                  We add less than 5kb to your bundle size. User experience shouldn't cost performance.
+                  We add less than 5kb to your bundle size. User experience shouldn&apos;t cost performance.
                 </p>
               </div>
               <div className="mt-8">
@@ -147,7 +157,7 @@ export default function AboutPage() {
                 </div>
               <h3 className="text-xl font-bold mb-2">User Empathy</h3>
               <p className="text-muted-foreground text-sm">
-                We don't force users to click "Next" 10 times. We build non-intrusive nudges.
+                We don&apos;t force users to click &quot;Next&quot; 10 times. We build non-intrusive nudges.
               </p>
             </motion.div>
 
@@ -172,17 +182,12 @@ export default function AboutPage() {
       <section className="py-24 border-t border-border/40 bg-muted/5">
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight mb-4">Who's pushing to prod?</h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-4">Who&apos;s pushing to prod?</h2>
             <p className="text-muted-foreground">Small team, high output.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-            {[
-              { name: "Alex Chen", role: "CEO & Architecture", desc: "Ex-Stripe. obsessed with API design.", icon: "AC" },
-              { name: "Sarah Johnson", role: "Product", desc: "Turned a messy backlog into a roadmap.", icon: "SJ" },
-              { name: "Mike Davis", role: "Lead Engineer", desc: "Vim user. Breaks things so you don't have to.", icon: "MD" },
-              { name: "Emily Park", role: "Design Systems", desc: "Believes pixel perfection is a bare minimum.", icon: "EP" },
-            ].map((member, i) => (
+            {TEAM.map((member, i) => (
               <motion.div 
                 key={member.name}
                 initial={{ opacity: 0, x: -10 }}
@@ -191,7 +196,7 @@ export default function AboutPage() {
                 transition={{ delay: i * 0.1 }}
                 className="flex items-start gap-4 p-4 rounded-xl hover:bg-background hover:shadow-sm border border-transparent hover:border-border/50 transition-all duration-300"
               >
-                <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary to-black text-white flex items-center justify-center font-mono font-bold shrink-0">
+                <div className="h-12 w-12 rounded-lg bg-linear-to-br from-primary to-black text-white flex items-center justify-center font-mono font-bold shrink-0">
                   {member.icon}
                 </div>
                 <div>
