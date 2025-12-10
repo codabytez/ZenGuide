@@ -1,168 +1,178 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useQuery } from 'convex/react';
-import { api } from '@/convex/_generated/api';
-import { Id } from '@/convex/_generated/dataModel';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import React from "react";
+import { motion } from "framer-motion";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell,
-  Area, AreaChart
-} from 'recharts';
-import {
-  Eye, CheckCircle2,
-  Loader2, Users, Clock, Target
-} from 'lucide-react';
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent
+} from "@/components/ui/card";
+
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue,
+  SelectValue
 } from "@/components/ui/select";
 
-const EnhancedAnalytics: React.FC = () => {
-  const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
-  const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d'>('7d');
+import {
+  Eye, CheckCircle2, Users, Clock, Target, Loader2
+} from "lucide-react";
 
-  // Fetch all tours for overview
-  const tours = useQuery(api.tours.getUserTours);
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar
+} from "recharts";
 
-  // Fetch detailed analytics for selected tour
-  const tourAnalytics = useQuery(
+// ----------------------------------------
+// Types
+// ----------------------------------------
+interface OverviewData {
+  totalViews: number;
+  totalCompletions: number;
+  totalSkips: number;
+  uniqueVisitors: number;
+  avgSessionDuration: number;
+}
+
+const AnalyticsPage = () => {
+  const [selectedTourId, setSelectedTourId] = React.useState<Id<"tours"> | null>(null);
+  const [timeRange, setTimeRange] = React.useState<"24h" | "7d" | "30d">("7d");
+
+  // Fetch user
+  const user = useQuery(api.users.getCurrentUser);
+
+  // Don't load tours until user is known
+  const tours = useQuery(
+    api.tours.listTours,
+    user ? {} : "skip"
+  );
+
+  // Load analytics only when a tour is selected
+  const analytics = useQuery(
     api.analytics.getTourAnalytics,
-    selectedTourId ? {
-      tourId: selectedTourId as Id<"tours">,
-      timeRange
-    } : "skip"
+    selectedTourId ? { tourId: selectedTourId, timeRange } : "skip"
   );
 
-  // Fetch funnel analysis
-  const funnelAnalysis = useQuery(
-    api.analytics.getFunnelAnalysis,
-    selectedTourId ? { tourId: selectedTourId as Id<"tours"> } : "skip"
-  );
+  // Defaults to prevent undefined errors
+  const overview: OverviewData = analytics?.overview ?? {
+    totalViews: 0,
+    totalCompletions: 0,
+    totalSkips: 0,
+    uniqueVisitors: 0,
+    avgSessionDuration: 0
+  };
+
+  const stepMetrics = analytics?.stepMetrics ?? [];
+  const dailyBreakdown = analytics?.dailyBreakdown ?? [];
 
   // Auto-select first tour
   React.useEffect(() => {
     if (tours && tours.length > 0 && !selectedTourId) {
-      setSelectedTourId(tours[0].id);
+      setSelectedTourId(tours[0]._id);
     }
   }, [tours, selectedTourId]);
 
-  if (tours === undefined) {
+  // ----------------------------------------
+  // Loading states
+  // ----------------------------------------
+
+  if (user === undefined || tours === undefined) {
     return (
-      <div className="p-6 lg:p-8 flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading analytics...</p>
-        </div>
+      <div className="flex items-center justify-center h-[70vh]">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-[70vh]">
+        <p className="text-muted-foreground">You must be logged in to view analytics.</p>
       </div>
     );
   }
 
   if (tours.length === 0) {
     return (
-      <div className="p-6 lg:p-8">
-        <div className="text-center py-12">
-          <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">No Tours Yet</h2>
-          <p className="text-muted-foreground mb-6">
-            Create a tour to start tracking analytics
-          </p>
-        </div>
+      <div className="p-6 text-center">
+        <Target className="w-10 h-10 mx-auto text-muted-foreground mb-4" />
+        <h2 className="text-xl font-medium">No Tours Found</h2>
+        <p className="text-muted-foreground">Create a tour to start collecting analytics.</p>
       </div>
     );
   }
 
-  const overview = tourAnalytics?.overview;
-  const stepMetrics = tourAnalytics?.stepMetrics || [];
-  const dailyBreakdown = tourAnalytics?.dailyBreakdown || [];
+  // ----------------------------------------
+  // Stats Display
+  // ----------------------------------------
 
   const stats = [
-    {
-      label: 'Total Views',
-      value: overview?.totalViews?.toLocaleString() || '0',
-      icon: Eye,
-      color: 'text-blue-500',
-      change: '+12%'
-    },
-    {
-      label: 'Completions',
-      value: overview?.totalCompletions?.toLocaleString() || '0',
-      icon: CheckCircle2,
-      color: 'text-green-500',
-      change: '+8%'
-    },
-    {
-      label: 'Unique Visitors',
-      value: overview?.uniqueVisitors?.toLocaleString() || '0',
-      icon: Users,
-      color: 'text-purple-500',
-      change: '+15%'
-    },
-    {
-      label: 'Avg. Duration',
-      value: overview?.avgSessionDuration
-        ? `${Math.round(overview.avgSessionDuration / 1000)}s`
-        : '0s',
-      icon: Clock,
-      color: 'text-amber-500',
-      change: '-3%'
-    },
+    { label: "Total Views", value: overview.totalViews, icon: Eye },
+    { label: "Completions", value: overview.totalCompletions, icon: CheckCircle2 },
+    { label: "Unique Visitors", value: overview.uniqueVisitors, icon: Users },
+    { label: "Avg. Duration", value: `${Math.round(overview.avgSessionDuration / 1000)}s`, icon: Clock }
   ];
 
   const pieData = [
+    { name: "Completed", value: overview.totalCompletions, color: "hsl(var(--primary))" },
+    { name: "Skipped", value: overview.totalSkips, color: "hsl(var(--destructive))" },
     {
-      name: 'Completed',
-      value: overview?.totalCompletions || 0,
-      color: 'hsl(var(--primary))'
-    },
-    {
-      name: 'Skipped',
-      value: overview?.totalSkips || 0,
-      color: 'hsl(var(--destructive))'
-    },
-    {
-      name: 'In Progress',
-      value: (overview?.totalViews || 0) - (overview?.totalCompletions || 0) - (overview?.totalSkips || 0),
-      color: 'hsl(var(--accent))'
-    },
+      name: "In Progress",
+      value: overview.totalViews - overview.totalCompletions - overview.totalSkips,
+      color: "hsl(var(--accent))"
+    }
   ].filter(d => d.value > 0);
 
+  // ----------------------------------------
+
   return (
-    <div className="p-6 lg:p-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
+    <div className="p-6">
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-display font-bold text-foreground">Analytics</h1>
-            <p className="text-muted-foreground mt-1">Detailed tour performance metrics</p>
+            <h1 className="text-3xl font-bold">Analytics</h1>
+            <p className="text-muted-foreground">Track performance across your tours</p>
           </div>
 
           <div className="flex gap-3">
             {/* Tour Selector */}
-            <Select value={selectedTourId || ''} onValueChange={setSelectedTourId}>
+            <Select
+              value={selectedTourId ?? ""}
+              onValueChange={(v) => setSelectedTourId(v as Id<"tours">)}
+            >
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="Select tour" />
               </SelectTrigger>
               <SelectContent>
-                {tours.map(tour => (
-                  <SelectItem key={tour.id} value={tour.id}>
-                    {tour.name}
+                {tours.map((tour) => (
+                  <SelectItem key={tour._id} value={tour._id}>
+                    {tour.title}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
 
             {/* Time Range Selector */}
-            <Select value={timeRange} onValueChange={(v: '24h' | '7d' | '30d') => setTimeRange(v)}>
+            <Select value={timeRange} onValueChange={(v: any) => setTimeRange(v)}>
               <SelectTrigger className="w-[140px]">
                 <SelectValue />
               </SelectTrigger>
@@ -175,187 +185,59 @@ const EnhancedAnalytics: React.FC = () => {
           </div>
         </div>
 
-        {/* Stats Grid */}
+        {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          {stats.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-muted flex items-center justify-center ${stat.color}`}>
-                      <stat.icon className="w-6 h-6" />
-                    </div>
-                    <span className="text-xs font-medium text-green-500">{stat.change}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  <p className="text-2xl font-bold text-foreground mt-1">{stat.value}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
+          {stats.map((s, i) => (
+            <Card key={i}>
+              <CardContent className="p-6">
+                <p className="text-sm text-muted-foreground">{s.label}</p>
+                <p className="text-2xl font-bold mt-1">{s.value}</p>
+              </CardContent>
+            </Card>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* Trend Chart */}
+        {/* Trend Chart */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle>Daily Trend</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-80">
+              <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={dailyBreakdown}>
-                    <defs>
-                      <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="colorCompletions" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis
-                      dataKey="date"
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                    />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="views"
-                      stroke="hsl(var(--primary))"
-                      fillOpacity={1}
-                      fill="url(#colorViews)"
-                      strokeWidth={2}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="completions"
-                      stroke="hsl(var(--accent))"
-                      fillOpacity={1}
-                      fill="url(#colorCompletions)"
-                      strokeWidth={2}
-                    />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="date" />
+                    <YAxis />
+                    <Tooltip />
+                    <Area type="monotone" dataKey="views" stroke="#8884d8" fill="#8884d8" />
+                    <Area type="monotone" dataKey="completions" stroke="#82ca9d" fill="#82ca9d" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
 
-          {/* Completion Distribution */}
           <Card>
             <CardHeader>
-              <CardTitle>Completion Distribution</CardTitle>
+              <CardTitle>Completion Breakdown</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-80 flex flex-col items-center justify-center">
-                {pieData.length > 0 ? (
-                  <>
-                    <ResponsiveContainer width="100%" height="70%">
-                      <PieChart>
-                        <Pie
-                          data={pieData}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={90}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {pieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="flex flex-col gap-2 mt-4">
-                      {pieData.map((entry) => (
-                        <div key={entry.name} className="flex items-center justify-between gap-4">
-                          <div className="flex items-center gap-2">
-                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                            <span className="text-sm text-muted-foreground">{entry.name}</span>
-                          </div>
-                          <span className="text-sm font-medium">{entry.value}</span>
-                        </div>
+              <div className="h-72">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" outerRadius={90}>
+                      {pieData.map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
                       ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-muted-foreground">No data yet</p>
-                )}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Funnel Analysis */}
-        {funnelAnalysis && funnelAnalysis.length > 0 && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Step-by-Step Funnel</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {funnelAnalysis.map((step, index) => {
-                  const completionRate = step.viewed > 0
-                    ? (step.viewed / (overview?.totalCompletions ?? 1)) * 100
-                    : 0;
-                  const dropOffRate = step.viewed > 0 && (overview?.totalCompletions ?? 0) > 0
-                    ? ((overview?.totalCompletions ?? 0) - step.viewed) / (overview?.totalCompletions ?? 1) * 100
-                    : 0;
-
-                  return (
-                    <div key={step.stepId} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm font-medium text-muted-foreground">
-                            Step {index + 1}
-                          </span>
-                          <span className="text-sm font-medium">{step.title}</span>
-                        </div>
-                        <div className="flex items-center gap-4 text-sm">
-                          <span className="text-muted-foreground">
-                            {step.viewed} viewed
-                          </span>
-                          <span className="text-green-500 font-medium">
-                            {completionRate.toFixed(1)}% completed
-                          </span>
-                          {dropOffRate > 30 && (
-                            <span className="text-red-500 font-medium">
-                              ⚠️ {dropOffRate.toFixed(1)}% drop-off
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div
-                          className="bg-primary h-2 rounded-full transition-all"
-                          style={{ width: `${completionRate}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Step Performance */}
         {stepMetrics.length > 0 && (
@@ -364,35 +246,25 @@ const EnhancedAnalytics: React.FC = () => {
               <CardTitle>Step Performance</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64">
+              <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={stepMetrics}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis
-                      dataKey="stepId"
-                      stroke="hsl(var(--muted-foreground))"
-                      fontSize={12}
-                      tickFormatter={(value) => `Step ${value.split('-')[1] || value}`}
-                    />
-                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'hsl(var(--card))',
-                        border: '1px solid hsl(var(--border))',
-                        borderRadius: '8px',
-                      }}
-                    />
-                    <Bar dataKey="views" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="completions" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="title" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="views" fill="hsl(var(--primary))" />
+                    <Bar dataKey="completions" fill="hsl(var(--accent))" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
         )}
+
       </motion.div>
     </div>
   );
 };
 
-export default EnhancedAnalytics;
+export default AnalyticsPage;

@@ -1,3 +1,5 @@
+"use client";
+
 import React, {
   createContext,
   useContext,
@@ -5,217 +7,57 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import { TourConfig, TourState, TourStep } from "@/types/tour";
-import {
-  tourStorage,
-  createInitialState,
-  analyticsTracker,
-} from "@/lib/tour-utils";
-import { defaultTourSteps } from "@/data/default-tour";
 
-interface TourContextType {
-  config: TourConfig;
+import { TourConfig, TourState, TourStep } from "@/types/tour";
+
+type TourContextType = {
   state: TourState;
-  currentStep: TourStep | null;
-  isFirstStep: boolean;
-  isLastStep: boolean;
-  progress: number;
+  startTour: (config: TourConfig) => void;
+  endTour: () => void;
   nextStep: () => void;
-  prevStep: () => void;
-  goToStep: (index: number) => void;
-  skipTour: () => void;
-  completeTour: () => void;
-  pauseTour: () => void;
-  resumeTour: () => void;
-  restartTour: () => void;
-}
+};
 
 const TourContext = createContext<TourContextType | null>(null);
 
-export const useTour = () => {
-  const context = useContext(TourContext);
-  if (!context) {
-    throw new Error("useTour must be used within a TourProvider");
-  }
-  return context;
-};
-
-interface TourProviderProps {
-  children: React.ReactNode;
-  config?: Partial<TourConfig>;
-}
-
-export const TourProvider: React.FC<TourProviderProps> = ({
-  children,
-  config: userConfig,
-}) => {
-  const config: TourConfig = {
-    tourId: userConfig?.tourId || "default-tour",
-    name: userConfig?.name || "Getting Started",
-    steps: userConfig?.steps || defaultTourSteps,
-    showAvatar: userConfig?.showAvatar ?? true,
-    avatarPosition: userConfig?.avatarPosition || "left",
-    theme: userConfig?.theme || "dark",
-    onComplete: userConfig?.onComplete,
-    onSkip: userConfig?.onSkip,
-    onStepChange: userConfig?.onStepChange,
-  };
-
-  const [state, setState] = useState<TourState>(() => {
-    const savedState = tourStorage.getState(config.tourId);
-    if (savedState && savedState.isActive) {
-      return savedState;
-    }
-    return createInitialState();
+export function TourProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState<TourState>({
+    active: false,
+    stepIndex: 0,
+    steps: [],
   });
 
-  const currentStep = config.steps[state.currentStepIndex] || null;
-  const isFirstStep = state.currentStepIndex === 0;
-  const isLastStep = state.currentStepIndex === config.steps.length - 1;
-  const progress = ((state.currentStepIndex + 1) / config.steps.length) * 100;
+  const startTour = useCallback((config: TourConfig) => {
+    setState({
+      active: true,
+      stepIndex: 0,
+      steps: config.steps,
+    });
+  }, []);
 
-  // Save state on changes
-  useEffect(() => {
-    tourStorage.saveState(config.tourId, state);
-  }, [state, config.tourId]);
-
-  // Track step views
-  useEffect(() => {
-    if (state.isActive && currentStep) {
-      analyticsTracker.track({
-        type: "step_viewed",
-        stepId: currentStep.id,
-        stepIndex: state.currentStepIndex,
-      });
-    }
-  }, [state.currentStepIndex, state.isActive, currentStep]);
+  const endTour = useCallback(() => {
+    setState({
+      active: false,
+      stepIndex: 0,
+      steps: [],
+    });
+  }, []);
 
   const nextStep = useCallback(() => {
-    if (!isLastStep) {
-      setState((prev) => {
-        const newCompletedSteps = [...prev.completedSteps];
-        if (currentStep && !newCompletedSteps.includes(currentStep.id)) {
-          newCompletedSteps.push(currentStep.id);
-        }
-
-        analyticsTracker.track({
-          type: "step_completed",
-          stepId: currentStep?.id,
-          stepIndex: prev.currentStepIndex,
-        });
-
-        const newIndex = prev.currentStepIndex + 1;
-        config.onStepChange?.(config.steps[newIndex].id, newIndex);
-
-        return {
-          ...prev,
-          currentStepIndex: newIndex,
-          completedSteps: newCompletedSteps,
-        };
-      });
-    }
-  }, [isLastStep, currentStep, config]);
-
-  const prevStep = useCallback(() => {
-    if (!isFirstStep) {
-      setState((prev) => {
-        const newIndex = prev.currentStepIndex - 1;
-        config.onStepChange?.(config.steps[newIndex].id, newIndex);
-        return {
-          ...prev,
-          currentStepIndex: newIndex,
-        };
-      });
-    }
-  }, [isFirstStep, config]);
-
-  const goToStep = useCallback(
-    (index: number) => {
-      if (index >= 0 && index < config.steps.length) {
-        setState((prev) => ({
-          ...prev,
-          currentStepIndex: index,
-        }));
-        config.onStepChange?.(config.steps[index].id, index);
-      }
-    },
-    [config]
-  );
-
-  const skipTour = useCallback(() => {
-    analyticsTracker.track({
-      type: "tour_skipped",
-      stepId: currentStep?.id,
-      stepIndex: state.currentStepIndex,
+    setState((prev) => {
+      if (prev.stepIndex + 1 >= prev.steps.length) return prev;
+      return { ...prev, stepIndex: prev.stepIndex + 1 };
     });
-
-    setState((prev) => ({
-      ...prev,
-      isActive: false,
-    }));
-
-    config.onSkip?.();
-  }, [currentStep, state.currentStepIndex, config]);
-
-  const completeTour = useCallback(() => {
-    analyticsTracker.track({
-      type: "tour_completed",
-      stepId: currentStep?.id,
-      stepIndex: state.currentStepIndex,
-    });
-
-    tourStorage.markTourCompleted(config.tourId);
-
-    setState((prev) => ({
-      ...prev,
-      isActive: false,
-      completedSteps: [...prev.completedSteps, currentStep?.id || ""],
-    }));
-
-    config.onComplete?.();
-  }, [currentStep, state.currentStepIndex, config]);
-
-  const pauseTour = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      isPaused: true,
-    }));
-  }, []);
-
-  const resumeTour = useCallback(() => {
-    setState((prev) => ({
-      ...prev,
-      isPaused: false,
-    }));
-  }, []);
-
-  const restartTour = useCallback(() => {
-    analyticsTracker.reset();
-    analyticsTracker.track({ type: "tour_started" });
-
-    setState(createInitialState());
   }, []);
 
   return (
-    <TourContext.Provider
-      value={{
-        config,
-        state,
-        currentStep,
-        isFirstStep,
-        isLastStep,
-        progress,
-        nextStep,
-        prevStep,
-        goToStep,
-        skipTour,
-        completeTour,
-        pauseTour,
-        resumeTour,
-        restartTour,
-      }}
-    >
+    <TourContext.Provider value={{ state, startTour, endTour, nextStep }}>
       {children}
     </TourContext.Provider>
   );
+}
+
+export const useTour = () => {
+  const ctx = useContext(TourContext);
+  if (!ctx) throw new Error("useTour must be used within TourProvider");
+  return ctx;
 };
