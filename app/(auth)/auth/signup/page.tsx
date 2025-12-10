@@ -12,6 +12,8 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import Image from "next/image";
+import { Eye, EyeOff } from 'lucide-react'
 
 const Signup: React.FC = () => {
     const { signIn } = useAuthActions();
@@ -21,6 +23,7 @@ const Signup: React.FC = () => {
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
     // Import the checkEmailExists query
      const emailExists = useQuery(api.users.checkEmailExists, email ? { email } : "skip");
@@ -95,8 +98,16 @@ const Signup: React.FC = () => {
                     </Link>
 
                     <div className="flex items-center gap-2 mb-8">
-                        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-accent flex items-center justify-center">
-                            <Compass className="w-5 h-5 text-primary-foreground" />
+                        <div className="w-10 h-10 flex items-center justify-center">
+                            <div className="relative w-15 h-15 shrink-0">
+                                <Image
+                                src="/images/image.png"    
+                                alt="ZenGuide Logo"
+                                fill               
+                                className="object-contain"
+                                priority             
+                                />
+                            </div>
                         </div>
                         <span className="font-display font-bold text-xl text-foreground">
                             ZenGuide
@@ -140,16 +151,30 @@ const Signup: React.FC = () => {
                         </div>
 
                         <div>
-                            <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">Password</Label>
+                        <div className="relative mt-1.5">
                             <Input
-                                id="password"
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                required
-                                className="mt-1.5"
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="••••••••"
+                            required
+                            className="pr-10"
                             />
+                            <button
+                            type="button" 
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                            aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                            {showPassword ? (
+                                <EyeOff className="w-4 h-4" />
+                            ) : (
+                                <Eye className="w-4 h-4" />
+                            )}
+                            </button>
+                        </div>
                         </div>
 
                         <Button type="submit" className="w-full" disabled={loading}>

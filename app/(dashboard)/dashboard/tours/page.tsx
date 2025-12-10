@@ -82,8 +82,16 @@ const ToursPage = () => {
   };
 
   const copyEmbedCode = (tourId: string) => {
-    const code = `<script src="https://cdn.tourguide.app/widget.js"></script>
-<script>TourGuide.init({ tourId: '${tourId}' });</script>`;
+    const code = `<Script
+    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    strategy="afterInteractive"
+    data-tour-id="${tourId}"
+    data-auto-start="false"
+    data-position="bottom-right"
+    data-theme="light"
+    data-show-avatar="true"
+    data-avatar-position="center"
+  />`;
 
     navigator.clipboard.writeText(code);
     toast.success("Embed code copied!");

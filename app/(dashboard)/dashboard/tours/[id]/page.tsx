@@ -185,8 +185,16 @@ const TourEditor = () => {
   };
 
   const copyEmbedCode = () => {
-    const code = `<script src="https://cdn.tourguide.app/widget.js"></script>
-<script>TourGuide.init({ tourId: '${id}' });</script>`;
+    const code = `<Script
+    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    strategy="afterInteractive"
+    data-tour-id="${id}"
+    data-auto-start="false"
+    data-position="bottom-right"
+    data-theme="light"
+    data-show-avatar="true"
+    data-avatar-position="center"
+  />`;
 
     navigator.clipboard.writeText(code);
 
