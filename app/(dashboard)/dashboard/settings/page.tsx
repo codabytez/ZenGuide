@@ -1,8 +1,7 @@
 'use client';
 
-import  { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useTheme } from 'next-themes';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
@@ -12,12 +11,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
-import { Save, User, Bell, Palette, Shield, Moon, Sun, Loader2 } from 'lucide-react';
+import { Save, User, Palette, Shield, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { NextPage } from 'next';
 
 const SettingsPage: NextPage = () => {
-  const { theme, setTheme } = useTheme()
 
   // Convex hooks
   const currentUser = useQuery(api.userSettings.getCurrentUser)
@@ -37,15 +35,15 @@ const SettingsPage: NextPage = () => {
 
   const name = localEdits.name ?? currentUser?.name ?? ""
   const email = localEdits.email ?? currentUser?.email ?? ""
-  const emailNotifs = localEdits.emailNotifs ?? userSettings?.emailNotifications ?? true
-  const weeklyReport = localEdits.weeklyReport ?? userSettings?.weeklyReport ?? true
+  // const emailNotifs = localEdits.emailNotifs ?? userSettings?.emailNotifications ?? true
+  // const weeklyReport = localEdits.weeklyReport ?? userSettings?.weeklyReport ?? true
   const showAvatar = localEdits.showAvatar ?? userSettings?.defaultShowAvatar ?? true
   const autoStart = localEdits.autoStart ?? userSettings?.defaultAutoStart ?? true
 
   const setName = (value: string) => setLocalEdits((prev) => ({ ...prev, name: value }))
   const setEmail = (value: string) => setLocalEdits((prev) => ({ ...prev, email: value }))
-  const setEmailNotifs = (value: boolean) => setLocalEdits((prev) => ({ ...prev, emailNotifs: value }))
-  const setWeeklyReport = (value: boolean) => setLocalEdits((prev) => ({ ...prev, weeklyReport: value }))
+  // const setEmailNotifs = (value: boolean) => setLocalEdits((prev) => ({ ...prev, emailNotifs: value }))
+  // const setWeeklyReport = (value: boolean) => setLocalEdits((prev) => ({ ...prev, weeklyReport: value }))
   const setShowAvatar = (value: boolean) => setLocalEdits((prev) => ({ ...prev, showAvatar: value }))
   const setAutoStart = (value: boolean) => setLocalEdits((prev) => ({ ...prev, autoStart: value }))
 
@@ -61,18 +59,18 @@ const SettingsPage: NextPage = () => {
     }
   };
 
-  const handleSaveNotifications = async () => {
-    try {
-      await saveSettings({
-        emailNotifications: emailNotifs,
-        weeklyReport: weeklyReport,
-      });
-      toast.success('Notification preferences saved');
-    } catch (error) {
-      console.error('Error saving notifications:', error);
-      toast.error('Failed to save preferences');
-    }
-  };
+  // const handleSaveNotifications = async () => {
+  //   try {
+  //     await saveSettings({
+  //       emailNotifications: emailNotifs,
+  //       weeklyReport: weeklyReport,
+  //     });
+  //     toast.success('Notification preferences saved');
+  //   } catch (error) {
+  //     console.error('Error saving notifications:', error);
+  //     toast.error('Failed to save preferences');
+  //   }
+  // };
 
   const handleSaveWidget = async () => {
     try {
@@ -158,7 +156,7 @@ const SettingsPage: NextPage = () => {
         </Card>
 
         {/* Appearance Settings */}
-        <Card className="mb-6">
+        {/* <Card className="mb-6">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Palette className="w-5 h-5 text-primary" />
@@ -192,10 +190,10 @@ const SettingsPage: NextPage = () => {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Notification Settings */}
-        <Card className="mb-6">
+        {/* <Card className="mb-6">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Bell className="w-5 h-5 text-primary" />
@@ -223,7 +221,7 @@ const SettingsPage: NextPage = () => {
               <Save className="w-4 h-4" /> Save Preferences
             </Button>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Widget Defaults */}
         <Card className="mb-6">
