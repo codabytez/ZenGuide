@@ -42,7 +42,7 @@ export default function FeaturesGrid() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="text-3xl font-display font-bold text-foreground mb-3">
+          <h2 className="text-3xl font-display font-bold text-black mb-3">
             Powerful Features
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto">
@@ -51,11 +51,15 @@ export default function FeaturesGrid() {
         </motion.div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
-              className="group relative p-5 rounded-xl border border-border bg-card hover:bg-accent/50 transition-all duration-300"
+              className={`
+                group relative p-5 rounded-xl border border-border bg-card hover:bg-accent/50 transition-all duration-300
+                ${index < 2 ? "lg:col-span-3" : "lg:col-span-2"}
+                ${index === 4 ? "md:col-span-2 lg:col-span-2" : ""}
+              `}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * index }}
