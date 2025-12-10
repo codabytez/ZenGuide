@@ -56,9 +56,8 @@ export default function DemoHeader({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          Create engaging onboarding experiences with our embeddable widget.
-          Featuring 3D avatars, smooth animations, analytics tracking, and resume
-          capability.
+          Use our embeddable widget to create captivating onboarding experiences.
+          With resume capabilities, analytics tracking and  fluid animations.
         </motion.p>
 
         {/* CTA Button */}

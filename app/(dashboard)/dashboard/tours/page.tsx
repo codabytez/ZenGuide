@@ -15,14 +15,11 @@ import {
   Plus,
   Search,
   MoreVertical,
-  Edit,
   Trash2,
   Eye,
   Code2,
   Map,
   Loader2,
-  Calendar,
-  Activity,
 } from "lucide-react";
 
 import {
@@ -49,13 +46,13 @@ import { toast } from "sonner";
 const ToursPage = () => {
   const router = useRouter();
   // Convex hooks
+  const userSettings = useQuery(api.userSettings.getUserSettings);
   const tours = useQuery(api.tours.getUserTours);
   const deleteTour = useMutation(api.tours.deleteTour);
 
   // Local state
   const [search, setSearch] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [previewTourId, setPreviewTourId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Filter tours based on search
@@ -63,7 +60,6 @@ const ToursPage = () => {
     t.name.toLowerCase().includes(search.toLowerCase())
   ) || [];
 
-  const previewTour = tours?.find((t) => t.id === previewTourId);
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -81,9 +77,13 @@ const ToursPage = () => {
     }
   };
 
-  const copyEmbedCode = (tourId: string) => {
-    const code = `<script src="https://cdn.tourguide.app/widget.js"></script>
-<script>TourGuide.init({ tourId: '${tourId}' });</script>`;
+  const copyEmbedCode = (id: string) => {
+    const code = `<Script
+    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    data-tour-id="${id}"
+    data-auto-start="${userSettings?.defaultAutoStart}"
+    data-show-avatar="${userSettings?.defaultShowAvatar}"
+  />`;
 
     navigator.clipboard.writeText(code);
     toast.success("Embed code copied!");
@@ -157,6 +157,8 @@ const ToursPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
+                onClick={() => router.push(`/dashboard/tours/${tour.id}`)}
+                className="cursor-pointer"
               >
                 <Card className="group hover:shadow-lg transition-shadow">
                   <CardContent className="p-5">
@@ -189,7 +191,7 @@ const ToursPage = () => {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
                             <Link href={`/dashboard/tours/${tour.id}`}>
-                              <Edit className="w-4 h-4 mr-2" /> Edit
+                              <Eye className="w-4 h-4 mr-2" /> View
                             </Link>
                           </DropdownMenuItem>
 
@@ -210,10 +212,7 @@ const ToursPage = () => {
                     </div>
 
                     {/* CLICK TO OPEN PREVIEW */}
-                    <div
-                      onClick={() => router.push(`/dashboard/tours/${tour.id}`)}
-                      className="cursor-pointer"
-                    >
+                    <div>
                       <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
                         {tour.name}
                       </h3>
@@ -231,7 +230,7 @@ const ToursPage = () => {
                         <span className="flex items-center gap-1">
                           <Eye className="w-3.5 h-3.5" /> {tour.analytics.views}
                         </span>
-                        <span>{tour.analytics.avgCompletionRate}%</span>
+                        <span>{tour.analytics.avgCompletionRate.toFixed(2)}%</span>
                       </div>
                     </div>
                   </CardContent>

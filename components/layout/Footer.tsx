@@ -1,5 +1,5 @@
-import { Compass, Github } from 'lucide-react';
 import { NextPage } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 
 
@@ -11,21 +11,22 @@ const Footer: NextPage = () => {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-accent flex items-center justify-center">
-                <Compass className="w-4 h-4 text-primary-foreground" />
+              <div className="w-10 h-10 flex items-center justify-center">
+                <div className="relative w-15 h-15 shrink-0">
+                  <Image
+                    src="/images/image.png"
+                    alt="ZenGuide Logo"
+                    fill
+                    className="object-contain"
+                    priority
+                  />
+                </div>
               </div>
-              <span className="font-display font-bold text-foreground">TourGuide</span>
+              <span className="font-display font-bold text-foreground">ZenGuide</span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-sm">
-              Create beautiful, interactive onboarding tours for your web applications. 
-              Engage users from day one.
+              Make dynamic, captivating onboarding experiences that turn visitors into power users. Coding is not necessary.
             </p>
-            <div className="flex gap-3 mt-4">
-              <Link href="https://github.com/codabytez/ZenGuide.git" className="text-muted-foreground hover:text-foreground transition-colors">
-                <Github className="w-5 h-5" />
-              </Link>
-             
-            </div>
           </div>
 
           {/* Links */}
