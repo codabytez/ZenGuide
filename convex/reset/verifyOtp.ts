@@ -1,25 +1,18 @@
 import { mutation } from "../_generated/server";
 import { v } from "convex/values";
 
-export default mutation({
-  args: { email: v.string(), code: v.string() },
-  handler: async ({ db }, { email, code }) => {
-    const entry = await db.query("resetCodes")
+export const verifyOtp = mutation({
+  args: { email: v.string(), otp: v.string() },
+  async handler(ctx, { email, otp }) {
+    const entry = await ctx.db
+      .query("resetCodes")
       .withIndex("by_email", (q) => q.eq("email", email))
       .first();
 
-    if (!entry) throw new Error("No OTP found");
-    if (Date.now() > entry.expiresAt) throw new Error("OTP expired");
+    if (!entry) throw new Error("No reset request found.");
+    if (entry.expiresAt < Date.now()) throw new Error("OTP expired.");
+    if (entry.otp !== otp) throw new Error("Invalid OTP.");
 
-    // constant-time comparison suggestion: not available here, but string compare is used
-    if (entry.code !== code) {
-      // optional: increment failed attempts / lockout logic here
-      throw new Error("Invalid OTP");
-    }
-
-    // delete OTP after successful verification to prevent reuse
-    await db.delete(entry._id);
-
-    return { ok: true };
+    return { verified: true };
   },
 });

@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "tours": {
+      "path": "convex/tours.ts"
+    },
+    "analytics": {
+      "path": "convex/analytics.ts"
+    },
+    "reset": {
+      "path": "convex/reset"
+    }
+  }
+}

@@ -1,24 +1,108 @@
-import { v } from "convex/values";
 import { query, mutation } from "./_generated/server";
+import { v } from "convex/values";
+import bcrypt from "bcryptjs";
 
-// Get user by email (returns the user document but avoid exposing passwordHash to clients)
-export const getUserByEmail = query({
+/* =========================================
+   GET CURRENT AUTHENTICATED USER
+========================================= */
+export const getCurrentUser = query(async ({ auth, db }) => {
+  const identity = await auth.getUserIdentity();
+  if (!identity) return null;
+
+  // Lookup by email (unique index)
+  const user = await db
+    .query("users")
+    .withIndex("email", (q) => q.eq("email", identity.email!))
+    .first();
+
+  return user;
+});
+
+/* =========================================
+   CHECK IF EMAIL EXISTS (Signup validation)
+========================================= */
+export const checkEmailExists = query({
   args: { email: v.string() },
-  handler: async (ctx, { email }) => {
-    // return user document for server-side mutations; calling from client should be limited
-    return await ctx.db
+  async handler({ db }, { email }) {
+    const user = await db
       .query("users")
       .withIndex("email", (q) => q.eq("email", email))
       .first();
+
+    return user !== null;
   },
 });
 
-// Server-side helper to set passwordHash (should be used by server mutations only)
-export const setPasswordHash = mutation({
-  args: { userId: v.id("users"), passwordHash: v.string() },
-  handler: async (ctx, { userId, passwordHash }) => {
-    // If you have Convex Auth in place, ensure caller is authorized to update this user
-    await ctx.db.patch(userId, { passwordHash });
-    return { ok: true };
+/* =========================================
+   CREATE USER (Signup)
+========================================= */
+export const createUser = mutation({
+  args: {
+    email: v.string(),
+    password: v.string(),
+  },
+  async handler({ db }, { email, password }) {
+    const exists = await db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", email))
+      .first();
+
+    if (exists) throw new Error("Email already exists");
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const userId = await db.insert("users", {
+      email,
+      passwordHash,
+    });
+
+    return userId;
+  },
+});
+
+/* =========================================
+   LOGIN USER
+========================================= */
+export const loginUser = query({
+  args: {
+    email: v.string(),
+    password: v.string(),
+  },
+  async handler({ db }, { email, password }) {
+    const user = await db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", email))
+      .first();
+
+    if (!user) return null;
+
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) return null;
+
+    return user;
+  },
+});
+
+/* =========================================
+   RESET PASSWORD (Used after OTP verified)
+========================================= */
+export const updatePassword = mutation({
+  args: {
+    email: v.string(),
+    newPassword: v.string(),
+  },
+  async handler({ db }, { email, newPassword }) {
+    const user = await db
+      .query("users")
+      .withIndex("email", (q) => q.eq("email", email))
+      .first();
+
+    if (!user) throw new Error("User not found");
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+
+    await db.patch(user._id, { passwordHash });
+
+    return { success: true };
   },
 });
