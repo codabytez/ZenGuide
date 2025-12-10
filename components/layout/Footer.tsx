@@ -26,8 +26,7 @@ const Footer: NextPage = () => {
               <span className="font-display font-bold text-foreground">ZenGuide</span>
             </Link>
             <p className="text-muted-foreground text-sm max-w-sm">
-              Create beautiful, interactive onboarding tours for your web applications. 
-              Engage users from day one.
+              Make dynamic, captivating onboarding experiences that turn visitors into power users. Coding is not necessary.
             </p>
             <div className="flex gap-3 mt-4">
               <Link href="https://github.com/codabytez/ZenGuide.git" className="text-muted-foreground hover:text-foreground transition-colors">
