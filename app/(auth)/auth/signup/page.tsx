@@ -70,7 +70,7 @@ const Signup: React.FC = () => {
                         <Compass className="w-16 h-16 text-primary-foreground" />
                     </div>
                     <h2 className="text-2xl font-display font-bold text-foreground mb-2">
-                        Join TourGuide
+                        Join ZenGuide
                     </h2>
                     <p className="text-muted-foreground max-w-sm">
                         Start creating beautiful onboarding tours in minutes. No credit card
@@ -99,7 +99,7 @@ const Signup: React.FC = () => {
                             <Compass className="w-5 h-5 text-primary-foreground" />
                         </div>
                         <span className="font-display font-bold text-xl text-foreground">
-                            TourGuide
+                            ZenGuide
                         </span>
                     </div>
 
@@ -107,7 +107,7 @@ const Signup: React.FC = () => {
                         Create an account
                     </h1>
                     <p className="text-muted-foreground mb-8">
-                        Get started with TourGuide for free
+                        Get started with ZenGuide for free
                     </p>
 
 
@@ -120,7 +120,7 @@ const Signup: React.FC = () => {
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="John Doe"
+                                placeholder="Zen Guide"
                                 required
                                 className="mt-1.5"
                             />
@@ -133,7 +133,7 @@ const Signup: React.FC = () => {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@example.com"
+                                placeholder="zen@example.com"
                                 required
                                 className="mt-1.5"
                             />
