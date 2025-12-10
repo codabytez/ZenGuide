@@ -26,12 +26,12 @@ const item = {
 
 
 const TEAM = [
-    { name: "Lisan Al-Gaib", role: "Frontend Engineer", icon: "LA",  desc: "Ex-Stripe. obsessed with API design." },
-    { name: "TBNelly", role: "Fronted Engineer", icon: "TB", desc: "Turned a messy backlog into a roadmap." },
-    { name: "Chindindu Codes", role: "Frontend Engineer", icon: "CC", desc: "Vim user. Breaks things so you don't have to." },
-    { name: "Charlz", role: "Frontend Engineer", icon: "C" , desc: "Believes pixel perfection is a bare minimum."},
-    { name: "GIGO", role: "Frontend Engineer", icon: "GG", desc:'Believes in building locally before pushing codes' },
-    { name: "Ibn", role: "Frontend Engineer", icon: "IBN", desc:"Believes in the power of simplicity." },
+    { name: "Lisan Al-Gaib", role: "Frontend Engineer", icon: "LA",   },
+    { name: "TBNelly", role: "Fronted Engineer", icon: "TB"},
+    { name: "Chindindu Codes", role: "Frontend Engineer", icon: "CC", },
+    { name: "Charlz", role: "Frontend Engineer", icon: "C"},
+    { name: "GIGO", role: "Frontend Engineer", icon: "GG", },
+    { name: "Ibn", role: "Frontend Engineer", icon: "IBN",},
   ];
 
 export default function AboutPage() {
@@ -204,7 +204,7 @@ export default function AboutPage() {
                     {member.name}
                   </h3>
                   <p className="text-xs font-mono text-primary mb-1">{member.role}</p>
-                  <p className="text-sm text-muted-foreground leading-snug">{member.desc}</p>
+                  
                 </div>
               </motion.div>
             ))}
