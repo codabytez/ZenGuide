@@ -131,7 +131,7 @@ const Signup: React.FC = () => {
                                 type="text"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
-                                placeholder="John Doe"
+                                placeholder="Zen Guide"
                                 required
                                 className="mt-1.5"
                             />
@@ -144,7 +144,7 @@ const Signup: React.FC = () => {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@example.com"
+                                placeholder="zen@example.com"
                                 required
                                 className="mt-1.5"
                             />

@@ -53,8 +53,7 @@ export default function Home(){
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              Create engaging, interactive onboarding experiences that convert visitors 
-              into power users. No coding required.
+              Make dynamic, captivating onboarding experiences that turn visitors into power users. Coding is not necessary.
             </motion.p>
 
             <motion.div
@@ -63,7 +62,7 @@ export default function Home(){
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
-              <Link href="/signup">
+              <Link href="/auth/signup">
                 <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
                   Start Free <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -170,7 +169,7 @@ export default function Home(){
               Join hundreds of teams using ZenGuide to create exceptional user experiences.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/signup">
+              <Link href="/auth/signup">
                 <Button size="lg" className="gap-2 bg-primary text-primary-foreground hover:bg-primary/90">
                   <CheckCircle2 className="w-4 h-4" /> Get Started Free
                 </Button>
