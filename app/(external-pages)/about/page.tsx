@@ -2,11 +2,11 @@
 
 import { motion } from "framer-motion";
 import {
-    ArrowUpRight,
-    GitCommit,
-    Terminal,
-    Users,
-    Zap
+  ArrowUpRight,
+  GitCommit,
+  Terminal,
+  Users,
+  Zap
 } from "lucide-react";
 
 const container = {
@@ -26,23 +26,23 @@ const item = {
 
 
 const TEAM = [
-    { name: "Lisan Al-Gaib", role: "Frontend Engineer", icon: "LA",   },
-    { name: "TBNelly", role: "Fronted Engineer", icon: "TB"},
-    { name: "Chindindu Codes", role: "Frontend Engineer", icon: "CC", },
-    { name: "Charlz", role: "Frontend Engineer", icon: "C"},
-    { name: "GIGO", role: "Frontend Engineer", icon: "GG", },
-    { name: "Ibn", role: "Frontend Engineer", icon: "IBN",},
-  ];
+  { name: "Lisan Al-Gaib", role: "Code Breaker", icon: "LA", desc: "Wannabe Frontend Dev Shipping Beans to Production." },
+  { name: "TBNelly", role: "Fronted Engineer", icon: "TB" },
+  { name: "Chindindu Codes", role: "Frontend Engineer", icon: "CC", },
+  { name: "Charlz", role: "Frontend Engineer", icon: "C" },
+  { name: "GIGO", role: "Frontend Engineer", icon: "GG", },
+  { name: "Ibn", role: "Frontend Engineer", icon: "IBN", },
+];
 
 export default function AboutPage() {
   return (
-     <div className="min-h-screen bg-background text-foreground overflow-hidden">
-      
+    <div className="min-h-screen bg-background text-foreground overflow-hidden">
+
       {/* SECTION 1: The Manifesto (Replaces standard Hero) */}
       <section className="pt-32 pb-16 border-b border-border/40">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
-            
+
             {/* Left: Main Headline */}
             <div className="lg:col-span-8">
               <motion.div
@@ -55,15 +55,15 @@ export default function AboutPage() {
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                   </span>
-                  v1.0 Public Build
+                  v1.0 Stable Release
                 </div>
                 <h1 className="text-5xl md:text-7xl font-display font-bold tracking-tight leading-[0.95] mb-8">
                   Software shouldn&apos;t <br />
                   <span className="text-primary/60">feel like a maze.</span>
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-2xl leading-relaxed">
-                  We got tired of watching users sign up and drop off within 60 seconds. 
-                  ZenGuide wasn&apos;t born in a boardroom; it was built during a hackathon to fix 
+                  We got tired of watching users sign up and drop off within 60 seconds.
+                  ZenGuide wasn&apos;t born in a boardroom; it was built during a hackathon to fix
                   our own broken onboarding flow. Now, it handles the &lsquo;hello&rsquo; for 2M+ users.
                 </p>
               </motion.div>
@@ -71,7 +71,7 @@ export default function AboutPage() {
 
             {/* Right: Quick Stats (Integrated subtly) */}
             <div className="lg:col-span-4 lg:text-right flex flex-col gap-6">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -81,7 +81,7 @@ export default function AboutPage() {
                 <p className="text-sm text-muted-foreground uppercase tracking-wider font-medium">Active sessions handled</p>
               </motion.div>
               <div className="h-px w-full bg-border/50" />
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
@@ -103,7 +103,7 @@ export default function AboutPage() {
             <p className="hidden md:block text-muted-foreground font-mono text-sm">/src/components/values</p>
           </div>
 
-          <motion.div 
+          <motion.div
             variants={container}
             initial="hidden"
             whileInView="show"
@@ -121,8 +121,8 @@ export default function AboutPage() {
                 </div>
                 <h3 className="text-xl font-bold mb-3">Dev-First Architecture</h3>
                 <p className="text-muted-foreground max-w-md">
-                  Most onboarding tools are bloated overlays. We built a headless engine 
-                  that respects your DOM. No fighting with z-indexes, no iframe nightmares. 
+                  Most onboarding tools are bloated overlays. We built a headless engine
+                  that respects your DOM. No fighting with z-indexes, no iframe nightmares.
                   Just a clean Script tag.
                 </p>
               </div>
@@ -140,21 +140,21 @@ export default function AboutPage() {
                 </p>
               </div>
               <div className="mt-8">
-                 <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
-                    <div className="h-full bg-primary w-[95%]" />
-                 </div>
-                 <div className="flex justify-between mt-2 text-xs font-mono text-muted-foreground">
-                    <span>Performance Score</span>
-                    <span>98/100</span>
-                 </div>
+                <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
+                  <div className="h-full bg-primary w-[95%]" />
+                </div>
+                <div className="flex justify-between mt-2 text-xs font-mono text-muted-foreground">
+                  <span>Performance Score</span>
+                  <span>98/100</span>
+                </div>
               </div>
             </motion.div>
 
             {/* Card 3: Standard */}
             <motion.div variants={item} className="p-8 rounded-3xl bg-card border border-border/50">
-               <div className="h-10 w-10 bg-background rounded-xl border border-border flex items-center justify-center mb-6 shadow-xs">
-                  <Users className="h-5 w-5 text-blue-500" />
-                </div>
+              <div className="h-10 w-10 bg-background rounded-xl border border-border flex items-center justify-center mb-6 shadow-xs">
+                <Users className="h-5 w-5 text-blue-500" />
+              </div>
               <h3 className="text-xl font-bold mb-2">User Empathy</h3>
               <p className="text-muted-foreground text-sm">
                 We don&apos;t force users to click &quot;Next&quot; 10 times. We build non-intrusive nudges.
@@ -165,8 +165,8 @@ export default function AboutPage() {
             <motion.div variants={item} className="md:col-span-2 p-8 rounded-3xl bg-card border border-border/50 flex items-center justify-between group cursor-pointer">
               <div className="max-w-lg">
                 <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
-                    Open Source at heart 
-                    <span className="text-xs bg-muted px-2 py-0.5 rounded text-muted-foreground font-normal">Coming Soon</span>
+                  Open Source at heart
+                  <span className="text-xs bg-muted px-2 py-0.5 rounded text-muted-foreground font-normal">Coming Soon</span>
                 </h3>
                 <p className="text-muted-foreground text-sm">
                   We are preparing to open-source our core engine. We believe transparency builds better security.
@@ -188,7 +188,7 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
             {TEAM.map((member, i) => (
-              <motion.div 
+              <motion.div
                 key={member.name}
                 initial={{ opacity: 0, x: -10 }}
                 whileInView={{ opacity: 1, x: 0 }}
@@ -204,7 +204,7 @@ export default function AboutPage() {
                     {member.name}
                   </h3>
                   <p className="text-xs font-mono text-primary mb-1">{member.role}</p>
-                  
+                  {member?.desc && <p className="text-sm text-muted-foreground leading-snug">{member?.desc}</p>}
                 </div>
               </motion.div>
             ))}
