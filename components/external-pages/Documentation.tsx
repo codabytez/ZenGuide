@@ -1,17 +1,14 @@
 'use client'
 import { Button } from '@/components/ui/button';
-import { FAQ, SECTIONS } from '@/lib/constants/docs-contants';
-import { motion } from 'framer-motion';
-import { Book, Check, Code2, Copy, HelpCircle, Settings, Zap } from 'lucide-react';
+import { FAQ, GETTING_STARTED_STEPS, SECTIONS } from '@/lib/constants/docs-contants';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Book, Check, ChevronDown, Code2, Copy, HelpCircle, Settings, Zap } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Documentation(){
+export default function Documentation() {
   const [copied, setCopied] = useState<string | null>(null);
- const [currentSection, setCurrentSection] = useState('getting-started')
-
- 
-
-
+  const [currentSection, setCurrentSection] = useState('getting-started');
+  const [openFaq, setOpenFaq] = useState<number>(0); // Start with first FAQ open
 
   const copyCode = (code: string, id: string) => {
     navigator.clipboard.writeText(code);
@@ -19,54 +16,33 @@ export default function Documentation(){
     setTimeout(() => setCopied(null), 2000);
   };
 
-  
+  const embedCode = `<!-- Onboarding Tour Widget -->
+<Script
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
+    data-tour-id="kh7dw5smxjrbw7epxskr37xzd97wy72e"
+    data-auto-start="false"
+/>`;
 
-  const embedCode = `<script src="https://cdn.tourguide.app/widget.js"></script>
-<script>
-  TourGuide.init({
-    tourId: 'your-tour-id',
-    position: 'bottom-right',
-    showAvatar: true,
-  });
-</script>`;
-
-  const configCode = `TourGuide.init({
-  tourId: 'your-tour-id',
-  position: 'bottom-right',      // 'bottom-left' | 'center'
-  showAvatar: true,              // Show 3D avatar
-  autoStart: true,               // Start tour automatically
-  allowSkip: true,               // Allow users to skip
-  onComplete: () => {
-    console.log('Tour completed!');
-  },
-  onSkip: (stepId) => {
-    console.log('Skipped at step:', stepId);
-  }
-});`;
+  const configCode = `
+  data-tour-id="your-tour-id"           // (string) Your unique tour identifier
+  data-position="bottom-right"          // (string) Widget position: 'bottom-right', 'bottom-left', 'top-right', 'top-left'
+  data-show-avatar="true"               // (boolean) Show 3D avatar animation
+  data-auto-start="true"                // (boolean) Start tour on page load
+  data-avatar-position="center"         // (string) Avatar position: 'center', 'left', 'right'
+`;
 
   const apiCode = `// Start the tour
-TourGuide.start();
+window.TourGuide.start();
 
-// Go to specific step
-TourGuide.goToStep('step-3');
-
-// Pause/Resume
-TourGuide.pause();
-TourGuide.resume();
-
-// End the tour
-TourGuide.end();
-
-// Get current state
-const state = TourGuide.getState();
-console.log(state.currentStep, state.progress);`;
+// Stop the tour
+window.TourGuide.stop();`;
 
   return (
-   <>
+    <>
       <div className="mx-auto px-4 py-12 ">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
-          <aside className="hidden lg:block w-64 shrink-0">
+          <aside className="hidden lg:block w-64 shrink-0 ">
             <div className="sticky top-24">
               <h3 className="font-semibold text-foreground mb-4">Documentation</h3>
               <nav className="space-y-1">
@@ -106,17 +82,12 @@ console.log(state.currentStep, state.progress);`;
                 Getting Started
               </h2>
               <p className="text-muted-foreground mb-4">
-                TourGuide is an embeddable onboarding widget that helps you create 
-                beautiful, interactive tours for your web application. Follow these 
+                ZenGuide is an onboarding widget that helps you create interactive tours for your websites. Follow these
                 steps to get started in minutes.
               </p>
               <div className="bg-muted/50 rounded-xl p-6 border border-border/50">
                 <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
-                  <li>Create an account and access your dashboard</li>
-                  <li>Create a new tour and add your steps (minimum 5)</li>
-                  <li>Copy the embed code for your tour</li>
-                  <li>Paste the code into your website&apos;s HTML</li>
-                  <li>Your tour is live! Monitor analytics in the dashboard</li>
+                  {GETTING_STARTED_STEPS?.map(step => <li key={step.id}>{step.title}</li>)}
                 </ol>
               </div>
             </section>
@@ -128,8 +99,8 @@ console.log(state.currentStep, state.progress);`;
                 Installation
               </h2>
               <p className="text-muted-foreground mb-4">
-                Add the TourGuide script to your website. Place it before the closing 
-                <code className="px-1.5 py-0.5 bg-muted rounded text-sm mx-1">&lt;/body&gt;</code> 
+                Add the TourGuide script to your website. Place it before the closing
+                <code className="px-1.5 py-0.5 bg-muted rounded text-sm mx-1">&lt;/body&gt;</code>
                 tag for best performance.
               </p>
               <div className="relative  ">
@@ -180,36 +151,47 @@ console.log(state.currentStep, state.progress);`;
                       <th className="text-left py-3 px-4 font-semibold text-foreground">Description</th>
                     </tr>
                   </thead>
+
                   <tbody className="text-muted-foreground">
                     <tr className="border-b border-border/50">
-                      <td className="py-3 px-4"><code className="text-primary">tourId</code></td>
+                      <td className="py-3 px-4"><code className="text-primary">
+                        data-tour-id
+                      </code></td>
                       <td className="py-3 px-4">string</td>
                       <td className="py-3 px-4">required</td>
                       <td className="py-3 px-4">Your unique tour identifier</td>
                     </tr>
                     <tr className="border-b border-border/50">
-                      <td className="py-3 px-4"><code className="text-primary">position</code></td>
+                      <td className="py-3 px-4"><code className="text-primary">
+                        data-position
+                      </code></td>
                       <td className="py-3 px-4">string</td>
                       <td className="py-3 px-4">&lsquo;bottom-right&rsquo;</td>
                       <td className="py-3 px-4">Widget position on screen</td>
                     </tr>
                     <tr className="border-b border-border/50">
-                      <td className="py-3 px-4"><code className="text-primary">showAvatar</code></td>
+                      <td className="py-3 px-4"><code className="text-primary">
+                        data-show-avatar
+                      </code></td>
                       <td className="py-3 px-4">boolean</td>
                       <td className="py-3 px-4">true</td>
                       <td className="py-3 px-4">Show 3D avatar animation</td>
                     </tr>
                     <tr className="border-b border-border/50">
-                      <td className="py-3 px-4"><code className="text-primary">autoStart</code></td>
+                      <td className="py-3 px-4"><code className="text-primary">
+                        data-avatar-position
+                      </code></td>
+                      <td className="py-3 px-4">string</td>
+                      <td className="py-3 px-4">&lsquo;center&rsquo;</td>
+                      <td className="py-3 px-4">Avatar position on widget</td>
+                    </tr>
+                    <tr className="border-b border-border/50">
+                      <td className="py-3 px-4"><code className="text-primary">
+                        data-auto-start
+                      </code></td>
                       <td className="py-3 px-4">boolean</td>
                       <td className="py-3 px-4">true</td>
                       <td className="py-3 px-4">Start tour on page load</td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 px-4"><code className="text-primary">allowSkip</code></td>
-                      <td className="py-3 px-4">boolean</td>
-                      <td className="py-3 px-4">true</td>
-                      <td className="py-3 px-4">Allow users to skip the tour</td>
                     </tr>
                   </tbody>
                 </table>
@@ -240,17 +222,77 @@ console.log(state.currentStep, state.progress);`;
               </div>
             </section>
 
+            <section id='examples' className='mb-16'>
+              <h2 className="text-2xl font-display font-bold text-foreground mb-4 flex items-center gap-2">
+                <Code2 className="w-6 h-6 text-primary" />
+                Examples
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                Here are some example configurations for different use cases:
+              </p>
+              <div className="bg-muted/50 rounded-xl p-6 border border-border/50 space-y-6">
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">E-commerce Onboarding</h3>
+                  <pre className="bg-zinc-900 text-zinc-100 rounded-xl p-4 overflow-x-auto text-sm">
+                    <code>{`<Script
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
+    data-tour-id="ecom-onboarding-123"
+    data-auto-start="true"
+    data-show-avatar="true"
+    data-position="bottom-left"
+/>`}</code>
+                  </pre>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">SaaS Product Tour</h3>
+                  <pre className="bg-zinc-900 text-zinc-100 rounded-xl p-4 overflow-x-auto text-sm">
+                    <code>{`<Script
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
+    data-tour-id="saas-product-tour-456"
+    data-auto-start="false"
+    data-show-avatar="false"
+    data-position="top-right"
+/>`}</code>
+                  </pre>
+                </div>
+              </div>
+            </section>
+
             {/* FAQ */}
             <section id="faq" className="mb-16">
               <h2 className="text-2xl font-display font-bold text-foreground mb-4 flex items-center gap-2">
                 <HelpCircle className="w-6 h-6 text-primary" />
                 FAQ
               </h2>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {FAQ.map((faq, i) => (
-                  <div key={i} className="bg-muted/50 rounded-xl p-4 border border-border/50">
-                    <h4 className="font-semibold text-foreground mb-2">{faq.q}</h4>
-                    <p className="text-muted-foreground text-sm">{faq.a}</p>
+                  <div key={i} className="bg-muted/50 rounded-xl border border-border/50 overflow-hidden">
+                    <button
+                      onClick={() => setOpenFaq(openFaq === i ? -1 : i)}
+                      className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/80 transition-colors"
+                    >
+                      <h4 className="font-semibold text-foreground pr-4">{faq.question}</h4>
+                      <motion.div
+                        animate={{ rotate: openFaq === i ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" />
+                      </motion.div>
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {openFaq === i && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                        >
+                          <div className="px-4 pb-4">
+                            <p className="text-muted-foreground text-sm">{faq.answer}</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 ))}
               </div>
@@ -258,7 +300,7 @@ console.log(state.currentStep, state.progress);`;
           </div>
         </div>
       </div>
-   </>
+    </>
   );
-};
+}
 

@@ -6,15 +6,10 @@ import { Copy, Check } from "lucide-react";
 
 const embedCode = `<!-- Onboarding Tour Widget -->
 <Script
-        src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
-        strategy="afterInteractive"
-        data-tour-id="kh7dw5smxjrbw7epxskr37xzd97wy72e"
-        data-auto-start="false"
-        data-position="bottom-right"
-        data-theme="light"
-        data-show-avatar="true"
-        data-avatar-position="center"
-      />`;
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
+    data-tour-id="kh7dw5smxjrbw7epxskr37xzd97wy72e"
+    data-auto-start="false"
+/>`;
 
 export default function EmbedCodePreview() {
   const [copied, setCopied] = useState(false);
@@ -73,25 +68,10 @@ export default function EmbedCodePreview() {
                   {i + 1}
                 </span>
 
-                {/* Line content with syntax highlighting */}
-                <span
-                  className="flex-1"
-                  dangerouslySetInnerHTML={{
-                    __html: line
-                      .replace(
-                        /(&lt;|<)(\/?\w+)/g,
-                        '<span class="text-primary">$1$2</span>'
-                      )
-                      .replace(
-                        /(["'])(.*?)\1/g,
-                        '<span class="text-accent">$1$2$1</span>'
-                      )
-                      .replace(
-                        /\/\/.*/g,
-                        '<span class="text-muted-foreground">$&</span>'
-                      ),
-                  }}
-                />
+                {/* Line content */}
+                <span className="flex-1">
+                  {line}
+                </span>
               </div>
             ))}
           </code>

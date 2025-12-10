@@ -38,6 +38,7 @@ const TourEditor = () => {
 
   const isNew = id === "new";
 
+  const userSettings = useQuery(api.userSettings.getUserSettings);
   // Convex queries and mutations
   const existingTour = useQuery(
     api.tours.getTour,
@@ -186,14 +187,10 @@ const TourEditor = () => {
 
   const copyEmbedCode = () => {
     const code = `<Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
-    strategy="afterInteractive"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="${id}"
-    data-auto-start="false"
-    data-position="bottom-right"
-    data-theme="light"
-    data-show-avatar="true"
-    data-avatar-position="center"
+    data-auto-start="${userSettings?.defaultAutoStart}"
+    data-show-avatar="${userSettings?.defaultShowAvatar}"
   />`;
 
     navigator.clipboard.writeText(code);
@@ -464,14 +461,10 @@ const TourEditor = () => {
 
                 <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 text-sm overflow-x-auto">
                   {`  <Script
-    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
-    strategy="afterInteractive"
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
     data-tour-id="${id}"
-    data-auto-start="false"
-    data-position="bottom-right"
-    data-theme="light"
-    data-show-avatar="true"
-    data-avatar-position="center"
+    data-auto-start="${userSettings?.defaultAutoStart}"
+    data-show-avatar="${userSettings?.defaultShowAvatar}"
   />`}
                 </pre>
 

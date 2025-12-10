@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowLeft, FileQuestion, Home, Terminal } from "lucide-react";
+import { FileQuestion, Home, Terminal } from "lucide-react";
 import Link from "next/link";
 
 // Standard stagger for the main container content
@@ -80,7 +80,7 @@ const GlitchText = ({ text }: { text: string }) => (
       {text}
     </motion.span>
     {/* Main Layer */}
-    <span className="relative z-10 bg-gradient-to-b from-foreground to-muted-foreground bg-clip-text text-transparent">
+    <span className="relative z-10 bg-linear-to-b from-foreground to-muted-foreground bg-clip-text text-transparent">
       {text}
     </span>
   </>
@@ -90,11 +90,11 @@ export default function NotFound() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center overflow-hidden bg-background relative">
       {/* Background Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-size-[24px_24px]"></div>
       <div className="absolute inset-0 bg-radial-at-t from-primary/5 via-transparent to-background"></div>
 
       <div className="relative z-10 text-center px-4 max-w-2xl mx-auto">
-        {/* THE SPLIT 404 HEADLINE 
+        {/* THE SPLIT 404 HEADLINE
           We use a flex container to hold the stable part and the falling part side-by-side.
         */}
         <motion.div
