@@ -15,7 +15,6 @@ import {
   Plus,
   Search,
   MoreVertical,
-  Edit,
   Trash2,
   Eye,
   Code2,
@@ -40,11 +39,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useRouter } from "next/navigation";
 
 import { toast } from "sonner";
 
 const ToursPage = () => {
+  const router = useRouter();
   // Convex hooks
+  const userSettings = useQuery(api.userSettings.getUserSettings);
   const tours = useQuery(api.tours.getUserTours);
   const deleteTour = useMutation(api.tours.deleteTour);
 
@@ -57,6 +59,7 @@ const ToursPage = () => {
   const filteredTours = tours?.filter((t) =>
     t.name.toLowerCase().includes(search.toLowerCase())
   ) || [];
+
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -74,9 +77,13 @@ const ToursPage = () => {
     }
   };
 
-  const copyEmbedCode = (tourId: string) => {
-    const code = `<script src="https://cdn.tourguide.app/widget.js"></script>
-<script>TourGuide.init({ tourId: '${tourId}' });</script>`;
+  const copyEmbedCode = (id: string) => {
+    const code = `<Script
+    src="https://zenguide-widget.vercel.app/widget-bundle.js"
+    data-tour-id="${id}"
+    data-auto-start="${userSettings?.defaultAutoStart}"
+    data-show-avatar="${userSettings?.defaultShowAvatar}"
+  />`;
 
     navigator.clipboard.writeText(code);
     toast.success("Embed code copied!");
@@ -150,6 +157,8 @@ const ToursPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
+                onClick={() => router.push(`/dashboard/tours/${tour.id}`)}
+                className="cursor-pointer"
               >
                 <Card className="group hover:shadow-lg transition-shadow">
                   <CardContent className="p-5">
@@ -157,11 +166,10 @@ const ToursPage = () => {
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-2">
                         <div
-                          className={`w-2.5 h-2.5 rounded-full ${
-                            tour.isActive
-                              ? "bg-green-500"
-                              : "bg-muted-foreground"
-                          }`}
+                          className={`w-2.5 h-2.5 rounded-full ${tour.isActive
+                            ? "bg-green-500"
+                            : "bg-muted-foreground"
+                            }`}
                         />
                         <span className="text-xs text-muted-foreground">
                           {tour.isActive ? "Active" : "Inactive"}
@@ -170,7 +178,12 @@ const ToursPage = () => {
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={(e) => e.stopPropagation()}
+                          >
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
@@ -178,11 +191,13 @@ const ToursPage = () => {
                         <DropdownMenuContent align="end">
                           <DropdownMenuItem asChild>
                             <Link href={`/dashboard/tours/${tour.id}`}>
-                              <Edit className="w-4 h-4 mr-2" /> Edit
+                              <Eye className="w-4 h-4 mr-2" /> View
                             </Link>
                           </DropdownMenuItem>
 
-                          <DropdownMenuItem onClick={() => copyEmbedCode(tour.id)}>
+                          <DropdownMenuItem
+                            onClick={() => copyEmbedCode(tour.id)}
+                          >
                             <Code2 className="w-4 h-4 mr-2" /> Copy Embed Code
                           </DropdownMenuItem>
 
@@ -196,15 +211,15 @@ const ToursPage = () => {
                       </DropdownMenu>
                     </div>
 
-                    {/* CLICK TO OPEN EDIT PAGE */}
-                    <Link href={`/dashboard/tours/${tour.id}`}>
+                    {/* CLICK TO OPEN PREVIEW */}
+                    <div>
                       <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors">
                         {tour.name}
                       </h3>
                       <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
                         {tour.description || "No description"}
                       </p>
-                    </Link>
+                    </div>
 
                     {/* METRICS */}
                     <div className="flex items-center justify-between text-sm">
@@ -215,7 +230,7 @@ const ToursPage = () => {
                         <span className="flex items-center gap-1">
                           <Eye className="w-3.5 h-3.5" /> {tour.analytics.views}
                         </span>
-                        <span>{tour.analytics.avgCompletionRate.toFixed(0)}%</span>
+                        <span>{tour.analytics.avgCompletionRate.toFixed(2)}%</span>
                       </div>
                     </div>
                   </CardContent>
@@ -226,18 +241,19 @@ const ToursPage = () => {
         )}
       </motion.div>
 
+
       {/* DELETE DIALOG */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Tour?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the tour
-              and its analytics data.
+              This action cannot be undone. This will permanently delete the
+              tour and its analytics data.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
 
             <AlertDialogAction
               onClick={handleDelete}

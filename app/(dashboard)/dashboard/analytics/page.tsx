@@ -1,67 +1,58 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
-
+import { Id } from '@/convex/_generated/dataModel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line
+  ResponsiveContainer, PieChart, Pie, Cell,
+  Area, AreaChart
 } from 'recharts';
-import { Eye, CheckCircle2, SkipForward, TrendingUp, Loader2 } from 'lucide-react';
+import {
+  Eye, CheckCircle2,
+  Loader2, Users, Clock, Target
+} from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const AnalyticsPage: React.FC = () => {
-  // Fetch tours from Convex
+const EnhancedAnalytics: React.FC = () => {
+  const [selectedTourId, setSelectedTourId] = useState<string | null>(null);
+  const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d'>('7d');
+
+  // Fetch all tours for overview
   const tours = useQuery(api.tours.getUserTours);
 
-  // Calculate total stats
-  const totalStats = tours?.reduce(
-    (acc, tour) => ({
-      views: acc.views + tour.analytics.views,
-      completions: acc.completions + tour.analytics.completions,
-      skips: acc.skips + tour.analytics.skips,
-    }),
-    { views: 0, completions: 0, skips: 0 }
-  ) || { views: 0, completions: 0, skips: 0 };
+  // Fetch detailed analytics for selected tour
+  const tourAnalytics = useQuery(
+    api.analytics.getTourAnalytics,
+    selectedTourId ? {
+      tourId: selectedTourId as Id<"tours">,
+      timeRange
+    } : "skip"
+  );
 
-  const avgCompletionRate = tours && tours.length > 0
-    ? tours.reduce((acc, t) => acc + t.analytics.avgCompletionRate, 0) / tours.length
-    : 0;
+  // Fetch funnel analysis
+  const funnelAnalysis = useQuery(
+    api.analytics.getFunnelAnalysis,
+    selectedTourId ? { tourId: selectedTourId as Id<"tours"> } : "skip"
+  );
 
-  // Prepare chart data
-  const barData = tours?.map(t => ({
-    name: t.name.length > 15 ? t.name.substring(0, 15) + '...' : t.name,
-    views: t.analytics.views,
-    completions: t.analytics.completions,
-  })) || [];
+  // Auto-select first tour
+  React.useEffect(() => {
+    if (tours && tours.length > 0 && !selectedTourId) {
+      setSelectedTourId(tours[0].id);
+    }
+  }, [tours, selectedTourId]);
 
-  const pieData = [
-    { name: 'Completed', value: totalStats.completions, color: 'hsl(var(--primary))' },
-    { name: 'Skipped', value: totalStats.skips, color: 'hsl(var(--muted-foreground))' },
-    { name: 'In Progress', value: totalStats.views - totalStats.completions - totalStats.skips, color: 'hsl(var(--accent))' },
-  ].filter(d => d.value > 0);
-
-  // Mock weekly data (you can replace this with real data from tourAnalytics.weeklyViews)
-  const weeklyData = [
-    { day: 'Mon', views: 120, completions: 85 },
-    { day: 'Tue', views: 145, completions: 102 },
-    { day: 'Wed', views: 180, completions: 128 },
-    { day: 'Thu', views: 165, completions: 115 },
-    { day: 'Fri', views: 190, completions: 142 },
-    { day: 'Sat', views: 95, completions: 68 },
-    { day: 'Sun', views: 80, completions: 55 },
-  ];
-
-  const stats = [
-    { label: 'Total Views', value: totalStats.views.toLocaleString(), icon: Eye, color: 'text-blue-500' },
-    { label: 'Completions', value: totalStats.completions.toLocaleString(), icon: CheckCircle2, color: 'text-green-500' },
-    { label: 'Skips', value: totalStats.skips.toLocaleString(), icon: SkipForward, color: 'text-amber-500' },
-    { label: 'Avg. Rate', value: `${avgCompletionRate.toFixed(1)}%`, icon: TrendingUp, color: 'text-primary' },
-  ];
-
-  // Loading state
   if (tours === undefined) {
     return (
       <div className="p-6 lg:p-8 flex items-center justify-center min-h-screen">
@@ -73,18 +64,118 @@ const AnalyticsPage: React.FC = () => {
     );
   }
 
+  if (tours.length === 0) {
+    return (
+      <div className="p-6 lg:p-8">
+        <div className="text-center py-12">
+          <Target className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">No Tours Yet</h2>
+          <p className="text-muted-foreground mb-6">
+            Create a tour to start tracking analytics
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const overview = tourAnalytics?.overview;
+  const stepMetrics = tourAnalytics?.stepMetrics || [];
+  const dailyBreakdown = tourAnalytics?.dailyBreakdown || [];
+
+  const stats = [
+    {
+      label: 'Total Views',
+      value: overview?.totalViews?.toLocaleString() || '0',
+      icon: Eye,
+      color: 'text-blue-500',
+      change: '+12%'
+    },
+    {
+      label: 'Completions',
+      value: overview?.totalCompletions?.toLocaleString() || '0',
+      icon: CheckCircle2,
+      color: 'text-green-500',
+      change: '+8%'
+    },
+    {
+      label: 'Unique Visitors',
+      value: overview?.uniqueVisitors?.toLocaleString() || '0',
+      icon: Users,
+      color: 'text-purple-500',
+      change: '+15%'
+    },
+    {
+      label: 'Avg. Duration',
+      value: overview?.avgSessionDuration
+        ? `${Math.round(overview.avgSessionDuration / 1000)}s`
+        : '0s',
+      icon: Clock,
+      color: 'text-amber-500',
+      change: '-3%'
+    },
+  ];
+
+  const pieData = [
+    {
+      name: 'Completed',
+      value: overview?.totalCompletions || 0,
+      color: 'hsl(var(--primary))'
+    },
+    {
+      name: 'Skipped',
+      value: overview?.totalSkips || 0,
+      color: 'hsl(var(--destructive))'
+    },
+    {
+      name: 'In Progress',
+      value: (overview?.totalViews || 0) - (overview?.totalCompletions || 0) - (overview?.totalSkips || 0),
+      color: 'hsl(var(--accent))'
+    },
+  ].filter(d => d.value > 0);
+
   return (
     <div className="p-6 lg:p-8">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <div className="mb-8">
-          <h1 className="text-3xl font-display font-bold text-foreground">Analytics</h1>
-          <p className="text-muted-foreground mt-1">Track your tour performance and user engagement</p>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-3xl font-display font-bold text-foreground">Analytics</h1>
+            <p className="text-muted-foreground mt-1">Detailed tour performance metrics</p>
+          </div>
+
+          <div className="flex gap-3">
+            {/* Tour Selector */}
+            <Select value={selectedTourId || ''} onValueChange={setSelectedTourId}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Select tour" />
+              </SelectTrigger>
+              <SelectContent>
+                {tours.map(tour => (
+                  <SelectItem key={tour.id} value={tour.id}>
+                    {tour.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Time Range Selector */}
+            <Select value={timeRange} onValueChange={(v: '24h' | '7d' | '30d') => setTimeRange(v)}>
+              <SelectTrigger className="w-[140px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="24h">Last 24 hours</SelectItem>
+                <SelectItem value="7d">Last 7 days</SelectItem>
+                <SelectItem value="30d">Last 30 days</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           {stats.map((stat, i) => (
             <motion.div
@@ -95,33 +186,47 @@ const AnalyticsPage: React.FC = () => {
             >
               <Card>
                 <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{stat.label}</p>
-                      <p className="text-2xl font-bold text-foreground mt-1">{stat.value}</p>
-                    </div>
+                  <div className="flex items-center justify-between mb-4">
                     <div className={`w-12 h-12 rounded-xl bg-muted flex items-center justify-center ${stat.color}`}>
                       <stat.icon className="w-6 h-6" />
                     </div>
+                    <span className="text-xs font-medium text-green-500">{stat.change}</span>
                   </div>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                  <p className="text-2xl font-bold text-foreground mt-1">{stat.value}</p>
                 </CardContent>
               </Card>
             </motion.div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          {/* Weekly Trend */}
-          <Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Trend Chart */}
+          <Card className="lg:col-span-2">
             <CardHeader>
-              <CardTitle>Weekly Trend</CardTitle>
+              <CardTitle>Daily Trend</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64">
+              <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={weeklyData}>
+                  <AreaChart data={dailyBreakdown}>
+                    <defs>
+                      <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="colorCompletions" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--accent))" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="hsl(var(--accent))" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <XAxis
+                      dataKey="date"
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                      tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
                     <Tooltip
                       contentStyle={{
@@ -130,9 +235,23 @@ const AnalyticsPage: React.FC = () => {
                         borderRadius: '8px',
                       }}
                     />
-                    <Line type="monotone" dataKey="views" stroke="hsl(var(--primary))" strokeWidth={2} />
-                    <Line type="monotone" dataKey="completions" stroke="hsl(var(--accent))" strokeWidth={2} />
-                  </LineChart>
+                    <Area
+                      type="monotone"
+                      dataKey="views"
+                      stroke="hsl(var(--primary))"
+                      fillOpacity={1}
+                      fill="url(#colorViews)"
+                      strokeWidth={2}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="completions"
+                      stroke="hsl(var(--accent))"
+                      fillOpacity={1}
+                      fill="url(#colorCompletions)"
+                      strokeWidth={2}
+                    />
+                  </AreaChart>
                 </ResponsiveContainer>
               </div>
             </CardContent>
@@ -144,60 +263,117 @@ const AnalyticsPage: React.FC = () => {
               <CardTitle>Completion Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 flex items-center justify-center">
+              <div className="h-80 flex flex-col items-center justify-center">
                 {pieData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={pieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {pieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: 'hsl(var(--card))',
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px',
-                        }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <>
+                    <ResponsiveContainer width="100%" height="70%">
+                      <PieChart>
+                        <Pie
+                          data={pieData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={60}
+                          outerRadius={90}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {pieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="flex flex-col gap-2 mt-4">
+                      {pieData.map((entry) => (
+                        <div key={entry.name} className="flex items-center justify-between gap-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
+                            <span className="text-sm text-muted-foreground">{entry.name}</span>
+                          </div>
+                          <span className="text-sm font-medium">{entry.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 ) : (
                   <p className="text-muted-foreground">No data yet</p>
                 )}
-              </div>
-              <div className="flex justify-center gap-6 mt-4">
-                {pieData.map((entry) => (
-                  <div key={entry.name} className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-                    <span className="text-sm text-muted-foreground">{entry.name}</span>
-                  </div>
-                ))}
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Tours Comparison */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tours Comparison</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-72">
-              {barData.length > 0 ? (
+        {/* Funnel Analysis */}
+        {funnelAnalysis && funnelAnalysis.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Step-by-Step Funnel</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {funnelAnalysis.map((step, index) => {
+                  const completionRate = step.viewed > 0
+                    ? (step.viewed / (overview?.totalCompletions ?? 1)) * 100
+                    : 0;
+                  const dropOffRate = step.viewed > 0 && (overview?.totalCompletions ?? 0) > 0
+                    ? ((overview?.totalCompletions ?? 0) - step.viewed) / (overview?.totalCompletions ?? 1) * 100
+                    : 0;
+
+                  return (
+                    <div key={step.stepId} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-medium text-muted-foreground">
+                            Step {index + 1}
+                          </span>
+                          <span className="text-sm font-medium">{step.title}</span>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm">
+                          <span className="text-muted-foreground">
+                            {step.viewed} viewed
+                          </span>
+                          <span className="text-green-500 font-medium">
+                            {completionRate.toFixed(1)}% completed
+                          </span>
+                          {dropOffRate > 30 && (
+                            <span className="text-red-500 font-medium">
+                              ⚠️ {dropOffRate.toFixed(1)}% drop-off
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-primary h-2 rounded-full transition-all"
+                          style={{ width: `${completionRate}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Step Performance */}
+        {stepMetrics.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Step Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barData}>
+                  <BarChart data={stepMetrics}>
                     <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <XAxis
+                      dataKey="stepId"
+                      stroke="hsl(var(--muted-foreground))"
+                      fontSize={12}
+                      tickFormatter={(value) => `Step ${value.split('-')[1] || value}`}
+                    />
                     <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
                     <Tooltip
                       contentStyle={{
@@ -210,17 +386,13 @@ const AnalyticsPage: React.FC = () => {
                     <Bar dataKey="completions" fill="hsl(var(--accent))" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center text-muted-foreground">
-                  Create tours to see comparison data
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </motion.div>
     </div>
   );
 };
 
-export default AnalyticsPage;
+export default EnhancedAnalytics;

@@ -1,13 +1,14 @@
 'use client';
-import { ConvexAuthNextjsProvider } from "@convex-dev/auth/nextjs";
-import {  ConvexReactClient } from "convex/react";
+import { ConvexAuthNextjsProvider } from "@convex-dev/auth/react/next";
+import { ConvexProvider } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
-const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
-export const ConvexProviderWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ConvexAuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <ConvexAuthNextjsProvider client={convex}>
-      {children}
+    <ConvexAuthNextjsProvider>
+      <ConvexProvider {...api}>
+        {children}
+      </ConvexProvider>
     </ConvexAuthNextjsProvider>
   );
 };

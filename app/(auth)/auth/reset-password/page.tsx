@@ -1,64 +1,37 @@
 "use client";
-
-import React, { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import { useAuth } from "@/context/auth-context";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function ResetPasswordPage() {
-  const { resetPassword, isLoading } = useAuth();
   const params = useSearchParams();
-  const email = params.get("email") ?? "";
   const router = useRouter();
+  const email = params.get("email");
 
+  const { resetPassword, isLoading } = useAuth();
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e) {
     e.preventDefault();
-    if (password.length < 8) {
-      // use your toast lib
-      alert("Password must be at least 8 characters.");
-      return;
-    }
-    if (password !== confirm) {
-      alert("Passwords do not match.");
-      return;
-    }
-    try {
-      await resetPassword(email, password);
-      router.push("/auth/reset-password/success");
-    } catch {
-      // handled in context
-    }
+    await resetPassword(email, password);
+    router.push("/auth/login");
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8">
-      <form onSubmit={submit} className="w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold">Reset Password</h1>
-
-        <Input
-          type="password"
-          placeholder="New password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <Input
-          type="password"
-          placeholder="Confirm password"
-          required
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-        />
-
-        <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "Updating..." : "Reset Password"}
-        </Button>
-      </form>
-    </div>
+    <form onSubmit={submit} className="max-w-md mx-auto p-8 space-y-4">
+      <h1 className="text-2xl font-semibold">Set New Password</h1>
+      <Input
+        type="password"
+        placeholder="New password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        required
+      />
+      <Button disabled={isLoading} className="w-full">
+        {isLoading ? "Resetting..." : "Reset Password"}
+      </Button>
+    </form>
   );
 }

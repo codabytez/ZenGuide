@@ -4,9 +4,9 @@ import { motion } from "framer-motion";
 import { Rocket } from "lucide-react";
 
 export default function DemoHeader({
-  onStartTour,
+  onStartTourAction,
 }: {
-  onStartTour: () => void;
+  onStartTourAction: () => void;
 }) {
   return (
     <header className="relative overflow-hidden">
@@ -56,14 +56,13 @@ export default function DemoHeader({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          Create engaging onboarding experiences with our embeddable widget.
-          Featuring 3D avatars, smooth animations, analytics tracking, and resume
-          capability.
+          Use our embeddable widget to create captivating onboarding experiences.
+          With resume capabilities, analytics tracking and  fluid animations.
         </motion.p>
 
         {/* CTA Button */}
         <motion.button
-          onClick={onStartTour}
+          onClick={onStartTourAction}
           className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-primary-foreground"
           style={{
             background:

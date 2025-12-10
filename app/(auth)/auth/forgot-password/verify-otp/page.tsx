@@ -1,44 +1,36 @@
 "use client";
-
-import React, { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useState } from "react";
 import { useAuth } from "@/context/auth-context";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-export default function VerifyOtp() {
-  const { verifyResetOtp, isLoading } = useAuth();
+export default function VerifyOtpPage() {
   const params = useSearchParams();
-  const email = params.get("email") ?? "";
-  const [code, setCode] = useState("");
+  const email = params.get("email");
   const router = useRouter();
 
-  async function submit(e: React.FormEvent) {
+  const { verifyResetOtp, isLoading } = useAuth();
+  const [code, setCode] = useState("");
+
+  async function submit(e) {
     e.preventDefault();
-    try {
-      await verifyResetOtp(email, code);
-      router.push(`/auth/reset-password?email=${encodeURIComponent(email)}`);
-    } catch {
-      // toast shown in context
-    }
+    await verifyResetOtp(email, code);
+    router.push(`/auth/reset-password?email=${email}`);
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8">
-      <form onSubmit={submit} className="w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold">Verify OTP</h1>
-        <Input
-          type="text"
-          placeholder="6-digit code"
-          value={code}
-          maxLength={6}
-          onChange={(e) => setCode(e.target.value)}
-          required
-        />
-        <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "Verifying..." : "Verify"}
-        </Button>
-      </form>
-    </div>
+    <form onSubmit={submit} className="max-w-md mx-auto p-8 space-y-4">
+      <h1 className="text-2xl font-semibold">Verify OTP</h1>
+      <Input
+        placeholder="Enter OTP"
+        value={code}
+        onChange={e => setCode(e.target.value)}
+        required
+      />
+      <Button disabled={isLoading} className="w-full">
+        {isLoading ? "Verifying..." : "Verify OTP"}
+      </Button>
+    </form>
   );
 }

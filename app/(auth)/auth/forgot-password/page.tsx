@@ -1,42 +1,34 @@
 "use client";
-
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
   const { requestPasswordReset, isLoading } = useAuth();
   const [email, setEmail] = useState("");
-  const router = useRouter();
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e) {
     e.preventDefault();
-    try {
-      await requestPasswordReset(email);
-      router.push(`/auth/forgot-password/verify-otp?email=${encodeURIComponent(email)}`);
-    } catch {
-      // toast already shown in context, optionally show more
-    }
+    await requestPasswordReset(email);
+    router.push(`/auth/forgot-password/verify-otp?email=${email}`);
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-8">
-      <form onSubmit={submit} className="w-full max-w-md space-y-4">
-        <h1 className="text-2xl font-bold">Forgot Password</h1>
-        <Input
-          type="email"
-          placeholder="you@example.com"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Button type="submit" disabled={isLoading} className="w-full">
-          {isLoading ? "Sending..." : "Send OTP"}
-        </Button>
-      </form>
-    </div>
+    <form onSubmit={submit} className="max-w-md mx-auto p-8 space-y-4">
+      <h1 className="text-2xl font-semibold">Forgot Password</h1>
+      <Input
+        type="email"
+        placeholder="you@example.com"
+        value={email}
+        onChange={e => setEmail(e.target.value)}
+        required
+      />
+      <Button disabled={isLoading} className="w-full">
+        {isLoading ? "Sending..." : "Send OTP"}
+      </Button>
+    </form>
   );
 }
