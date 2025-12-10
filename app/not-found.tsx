@@ -1,8 +1,19 @@
+"use client";
+
+import Link from "next/link";
+
+
+
 export default function NotFound() {
   return (
-    <div className="text-center flex flex-col gap-5 items-center h-screen justify-center ">
-      <p className="text-xl font-semibold">404 | Current Page not found</p>
-      <p>(Todo: Style this page after all pages have been built)</p>
+     <div className="flex min-h-screen items-center justify-center bg-muted">
+      <div className="text-center">
+        <h1 className="mb-4 text-4xl font-bold">404</h1>
+        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
+        <Link href="/" className="text-primary underline hover:text-primary/90">
+          Return to Home
+        </Link>
+      </div>
     </div>
   );
 }

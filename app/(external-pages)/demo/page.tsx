@@ -41,13 +41,8 @@ export default function DemoPage() {
       {/* Load the tour widget */}
       <Script
         src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
-        strategy="afterInteractive"
         data-tour-id="kh7dw5smxjrbw7epxskr37xzd97wy72e"
         data-auto-start="false"
-        data-position="bottom-right"
-        data-theme="light"
-        data-show-avatar="true"
-        data-avatar-position="center"
       />
 
       <TourProvider>

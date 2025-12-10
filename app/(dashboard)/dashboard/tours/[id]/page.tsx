@@ -25,6 +25,8 @@ import {
   Check,
   Code2,
   Loader2,
+  Edit,
+  X,
 } from "lucide-react";
 
 import { toast } from "sonner";
@@ -35,7 +37,8 @@ const TourEditor = () => {
   const id = params?.id as string;
 
   const isNew = id === "new";
-  
+
+  const userSettings = useQuery(api.userSettings.getUserSettings);
   // Convex queries and mutations
   const existingTour = useQuery(
     api.tours.getTour,
@@ -57,6 +60,7 @@ const TourEditor = () => {
   const [copied, setCopied] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(!isNew);
+  const [isEditing, setIsEditing] = useState(isNew); // Auto-enable editing for new tours
 
   // Load existing tour data
   useEffect(() => {
@@ -130,6 +134,7 @@ const TourEditor = () => {
         toast.success("Tour saved successfully!", {
           description: "Your changes have been saved.",
         });
+        setIsEditing(false); // Exit editing mode after save
       }
     } catch (error) {
       toast.error("Failed to save tour");
@@ -137,6 +142,17 @@ const TourEditor = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleCancelEdit = () => {
+    // Reset to original data
+    if (existingTour) {
+      setName(existingTour.name);
+      setDescription(existingTour.description || "");
+      setIsActive(existingTour.isActive);
+      setSteps(existingTour.steps);
+    }
+    setIsEditing(false);
   };
 
   const handleAddStep = () => {
@@ -170,8 +186,12 @@ const TourEditor = () => {
   };
 
   const copyEmbedCode = () => {
-    const code = `<script src="https://cdn.tourguide.app/widget.js"></script>
-<script>TourGuide.init({ tourId: '${id}' });</script>`;
+    const code = `<Script
+    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    data-tour-id="${id}"
+    data-auto-start="${userSettings?.defaultAutoStart}"
+    data-show-avatar="${userSettings?.defaultShowAvatar}"
+  />`;
 
     navigator.clipboard.writeText(code);
 
@@ -203,23 +223,43 @@ const TourEditor = () => {
 
           <div className="flex-1">
             <h1 className="text-2xl font-display font-bold text-foreground">
-              {isNew ? "Create Tour" : "Edit Tour"}
+              {isNew ? "Create Tour" : isEditing ? "Edit Tour" : "Tour Details"}
             </h1>
           </div>
 
-          <Button onClick={handleSave} disabled={isSaving} className="gap-2">
-            {isSaving ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                Save
-              </>
-            )}
-          </Button>
+          {isEditing ? (
+            <div className="flex gap-2">
+              {!isNew && (
+                <Button
+                  variant="outline"
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                  className="gap-2"
+                >
+                  <X className="w-4 h-4" />
+                  Cancel
+                </Button>
+              )}
+              <Button onClick={handleSave} disabled={isSaving} className="gap-2">
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4" />
+                    Save
+                  </>
+                )}
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={() => setIsEditing(true)} className="gap-2">
+              <Edit className="w-4 h-4" />
+              Edit
+            </Button>
+          )}
         </div>
 
         {/* Tour Details */}
@@ -230,25 +270,35 @@ const TourEditor = () => {
           <CardContent className="space-y-4">
             <div>
               <Label htmlFor="name">Tour Name</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="e.g., Product Onboarding"
-                className="mt-1.5"
-              />
+              {isEditing ? (
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="e.g., Product Onboarding"
+                  className="mt-1.5"
+                />
+              ) : (
+                <p className="mt-1.5 text-sm">{name || "No name"}</p>
+              )}
             </div>
 
             <div>
               <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe what this tour is for..."
-                className="mt-1.5"
-                rows={3}
-              />
+              {isEditing ? (
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe what this tour is for..."
+                  className="mt-1.5"
+                  rows={3}
+                />
+              ) : (
+                <p className="mt-1.5 text-sm text-muted-foreground">
+                  {description || "No description"}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center justify-between">
@@ -258,7 +308,11 @@ const TourEditor = () => {
                   Enable this tour on your site
                 </p>
               </div>
-              <Switch checked={isActive} onCheckedChange={setIsActive} />
+              <Switch
+                checked={isActive}
+                onCheckedChange={setIsActive}
+                disabled={!isEditing}
+              />
             </div>
           </CardContent>
         </Card>
@@ -269,29 +323,33 @@ const TourEditor = () => {
             <CardTitle>
               Steps ({steps.length}/5 minimum)
             </CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAddStep}
-              className="gap-1"
-            >
-              <Plus className="w-4 h-4" />
-              Add Step
-            </Button>
+            {isEditing && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAddStep}
+                className="gap-1"
+              >
+                <Plus className="w-4 h-4" />
+                Add Step
+              </Button>
+            )}
           </CardHeader>
 
           <CardContent>
             {steps.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 <p className="mb-4">
-                  No steps yet. Add at least 5 steps to your tour.
+                  No steps yet. {isEditing && "Add at least 5 steps to your tour."}
                 </p>
-                <Button onClick={handleAddStep} variant="outline">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add First Step
-                </Button>
+                {isEditing && (
+                  <Button onClick={handleAddStep} variant="outline">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add First Step
+                  </Button>
+                )}
               </div>
-            ) : (
+            ) : isEditing ? (
               <Reorder.Group
                 axis="y"
                 values={steps}
@@ -355,9 +413,31 @@ const TourEditor = () => {
                   </Reorder.Item>
                 ))}
               </Reorder.Group>
+            ) : (
+              <div className="space-y-4">
+                {steps.map((step, index) => (
+                  <div
+                    key={step.id}
+                    className="p-4 rounded-lg border border-border bg-muted/30"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                        ID: {step.id}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        Step {index + 1}
+                      </span>
+                    </div>
+                    <h3 className="font-medium mb-1">{step.title}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {step.description || "No description"}
+                    </p>
+                  </div>
+                ))}
+              </div>
             )}
 
-            {steps.length > 0 && steps.length < 5 && (
+            {isEditing && steps.length > 0 && steps.length < 5 && (
               <p className="text-sm text-amber-500 mt-4">
                 Add {5 - steps.length} more step(s) to meet the minimum
                 requirement.
@@ -378,8 +458,15 @@ const TourEditor = () => {
 
             <CardContent>
               <div className="relative">
-                <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 text-sm overflow-x-auto">{`<script src="https://cdn.tourguide.app/widget.js"></script>
-<script>TourGuide.init({ tourId: '${id}' });</script>`}</pre>
+
+                <pre className="bg-zinc-900 text-zinc-100 rounded-lg p-4 text-sm overflow-x-auto">
+                  {`  <Script
+    src="https://timely-swan-1a2b58.netlify.app/widget-bundle.js"
+    data-tour-id="${id}"
+    data-auto-start="${userSettings?.defaultAutoStart}"
+    data-show-avatar="${userSettings?.defaultShowAvatar}"
+  />`}
+                </pre>
 
                 <Button
                   variant="ghost"

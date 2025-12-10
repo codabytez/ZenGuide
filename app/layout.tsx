@@ -19,6 +19,15 @@ export const metadata: Metadata = {
   title: "ZenGuide Onboarding Tour Platform",
   description:
     "An interactive platform to guide users through onboarding tours seamlessly.",
+  icons: {
+    icon: [
+      { url: './images/image.png' },
+    ],
+    shortcut: ['/images/image.png'],
+    apple: [
+      { url: '/images/image.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -28,19 +37,19 @@ export default function RootLayout({
 }>) {
   return (
     <ConvexAuthNextjsServerProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className={`${poppins.variable} font-sans antialiased`}>
-          <ConvexProviderWrapper>
-            <AuthProvider>
-              <ThemeProvider attribute="class" defaultTheme="system">
+      <ConvexProviderWrapper>
+        <AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="system">
+            <html lang="en" suppressHydrationWarning>
+              <body className={`${poppins.variable} font-sans antialiased`}>
                 {children}
                 <Toaster />
                 <Sonner richColors />
-              </ThemeProvider>
-            </AuthProvider>
-          </ConvexProviderWrapper>
-        </body>
-      </html>
+              </body>
+            </html>
+          </ThemeProvider>
+        </AuthProvider>
+      </ConvexProviderWrapper>
     </ConvexAuthNextjsServerProvider>
   );
 }

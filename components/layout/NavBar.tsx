@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Compass, Menu, X } from 'lucide-react';
 import { NextPage } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -34,9 +35,17 @@ const pathname =  usePathname();
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-lg bg-linear-to-br from-primary to-accent flex items-center justify-center">
-              <Compass className="w-5 h-5 text-primary-foreground" />
+          <Link href="/" className="flex items-center gap-2 group"> 
+            <div className="w-10 h-10 flex items-center justify-center">
+                <div className="relative w-15 h-15 shrink-0">
+                    <Image
+                    src="/images/image.png"    
+                    alt="ZenGuide Logo"
+                    fill               
+                    className="object-contain"
+                    priority             
+                    />
+                </div>
             </div>
             <span className="font-display font-bold text-lg text-foreground">
               ZenGuide
