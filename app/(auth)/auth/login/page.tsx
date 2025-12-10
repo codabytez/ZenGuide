@@ -12,50 +12,58 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { getAuthErrorMessage } from "@/lib/auth-errors";
 import Image from "next/image";
 import { Eye, EyeOff } from 'lucide-react';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+// Zod validation schema for login
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(1, "Password is required")
+    .min(8, "Password must be at least 8 characters"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 const Login: React.FC = () => {
   const { signIn } = useAuthActions();
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-//   const handleSubmit = async (e: React.FormEvent) => {
-//     e.preventDefault();
-//     try {
-//       await login(email, password);
-//       toast.success("Welcome back!");
-//       router.push("/dashboard");
-//     } catch (error) {
-//       toast.error("Login failed");
-//     }
-//   };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    mode: "onBlur",
+  });
 
-const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginFormData) => {
     setLoading(true);
-    setError("");
+    const toastId = toast.loading("Signing in...");
 
-    const toastId=toast.loading("Signing in...");
     try {
       await signIn("password", {
-        email,
-        password,
+        email: data.email,
+        password: data.password,
         flow: "signIn",
       });
-      // Redirect or show success message
+
       toast.success("Login successful", { id: toastId });
-      router.push('/dashboard')
+      router.push("/dashboard");
     } catch (err) {
       const friendlyMessage = getAuthErrorMessage(err);
-    setError(friendlyMessage);
-    toast.error(friendlyMessage, { id: toastId });
-
-    } //finally {
-     // setLoading(false);
-    //}
+      toast.error(friendlyMessage, { id: toastId });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -78,11 +86,11 @@ const handleSubmit = async (e: React.FormEvent) => {
           <div className="flex items-center mb-8">
             <div className="relative w-15 h-15 shrink-0">
               <Image
-                src="/images/image.png"    
+                src="/images/image.png"
                 alt="ZenGuide Logo"
-                fill               
+                fill
                 className="object-contain"
-                priority             
+                priority
               />
             </div>
             <span className="font-display font-bold text-xl text-foreground">
@@ -99,18 +107,21 @@ const handleSubmit = async (e: React.FormEvent) => {
 
 
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                required
-                className="mt-1.5"
+                className={`mt-1.5 ${errors.email ? "border-red-500" : ""}`}
+                {...register("email")}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             <div>
@@ -119,14 +130,12 @@ const handleSubmit = async (e: React.FormEvent) => {
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  {...register("password")}
                   placeholder="••••••••"
-                  required
-                  className="pr-10"
+                  className={`pr-10 ${errors.password ? "border-red-500" : ""}`}
                 />
                 <button
-                  type="button" 
+                  type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                   aria-label={showPassword ? "Hide password" : "Show password"}
@@ -138,6 +147,11 @@ const handleSubmit = async (e: React.FormEvent) => {
                   )}
                 </button>
               </div>
+              {errors.password && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
             {/* ✅ Corrected Forgot Password link */}
