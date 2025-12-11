@@ -61,9 +61,10 @@ const Login: React.FC = () => {
     } catch (err) {
       const friendlyMessage = getAuthErrorMessage(err);
       toast.error(friendlyMessage, { id: toastId });
-    } finally {
-      setLoading(false);
-    }
+    } 
+    // finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
